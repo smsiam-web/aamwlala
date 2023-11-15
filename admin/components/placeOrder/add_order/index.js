@@ -38,6 +38,20 @@ const AddOrder = ({ onClick }) => {
   const [products, setProducts] = useState(null);
   const [uid, setInvoiceID] = useState(null);
 
+console.log(uid?.invoice_id)
+    // Get products from firebase database
+    useEffect(() => {
+      const unSub = db.collection("orderID").onSnapshot((snap) => {
+        snap.docs.map((doc) => {
+          setInvoiceID(doc.data());
+        });
+      });
+  
+      return () => {
+        unSub();
+      };
+    }, []);
+
   // Get products from firebase database
   useEffect(() => {
     const unSub = db
@@ -59,22 +73,14 @@ const AddOrder = ({ onClick }) => {
     };
   }, []);
 
-  // Get products from firebase database
-  useEffect(() => {
-    const unSub = db.collection("orderID").onSnapshot((snap) => {
-      snap.docs.map((doc) => {
-        setInvoiceID(doc.data());
-      });
-    });
-
-    return () => {
-      unSub();
-    };
-  }, []);
-
   // place product handler on submit
   const placeOrder = async (values) => {
     setLoading(true);
+    const invoice_id = Number(uid?.invoice_id) + 1;
+    await updateInvoiceID(invoice_id);
+    const invoice_str = `RA0${invoice_id}`;
+    const cusetomer_id = `RAC0${invoice_id}`;
+
     const order = [];
     let totalPrice = 0;
 
@@ -105,12 +111,9 @@ const AddOrder = ({ onClick }) => {
         totalPrice += p.total_price;
       });
 
-    const discount =
-      totalPrice - values.salePrice > 0 ? totalPrice - values?.salePrice : "0";
-    // values.salePrice += values.delivery_type ? 120 : 80;
-    const invoice_id = Number(uid?.invoice_id) + 1;
-    const invoice_str = `RA0${invoice_id}`;
-    const cusetomer_id = `RAC0${invoice_id}`;
+    const temp =  values.delivery_type ? totalPrice + 120 : totalPrice + 80;
+    const discount = temp - values.salePrice > 0 ? temp - values?.salePrice : "0";
+
     const date = Today();
 
     await placeOrderHandler(
@@ -123,11 +126,9 @@ const AddOrder = ({ onClick }) => {
       timestamp
     );
     await createCustomer(values, date, cusetomer_id, timestamp);
-    await updateInvoiceID(invoice_id);
-
+    router.push("/admin/place-order/id=" + invoice_str);
     sendConfirmationMsg(values, invoice_str, config);
     setLoading(false);
-    router.push("/admin/place-order/id=" + invoice_str);
   };
   
 

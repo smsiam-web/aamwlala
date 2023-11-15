@@ -241,7 +241,7 @@ const OrderTable = () => {
                             </td>
                             <td className="px-4 py-3">
                               <span className="text-sm font-bold">
-                                -{item?.discount}/-
+                                -{item?.discount}tk
                               </span>
                             </td>
 
