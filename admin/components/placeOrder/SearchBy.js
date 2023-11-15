@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import Button from "@/app/components/shared/Button";
 import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import { db } from "@/app/utils/firebase";
-import { useDispatch } from "react-redux";
-import { updateOrder } from "@/app/redux/slices/orderSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectOrder, updateOrder } from "@/app/redux/slices/orderSlice";
 import { daysInMonth } from "@/admin/utils/helpers";
 
 const SearchBy = ({ onClick }) => {
   const [currentValue, setCurrentValue] = useState(null);
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState(useSelector(selectOrder));
   const dispatch = useDispatch();
 
   const handleChange = (e) => {

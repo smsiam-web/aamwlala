@@ -20,7 +20,7 @@ const OrderTable = () => {
   const [loading, setLoading] = useState(false);
   const [filterOrder, setFilterOrder] = useState(null);
   const dispatch = useDispatch();
-  const [orders, setOrders] = useState(null);
+  const [orders, setOrders] = useState(useSelector(selectOrder));
   const [page, setPagee] = useState(1);
   const [opened, setOpened] = useState(false);
   const order = useSelector(selectOrder);
@@ -170,7 +170,7 @@ const OrderTable = () => {
       <div className="grid gap-4 w-full overflow-hidden ">
         <div className="w-full overflow-x-scroll rounded-md relative">
           {/* order table  */}
-          {!order.length ? (
+          {!orders.length ? (
             <NotFound text={"order"} />
           ) : (
             <table className="w-full whitespace-nowrap table-auto">
@@ -241,7 +241,7 @@ const OrderTable = () => {
                             </td>
                             <td className="px-4 py-3">
                               <span className="text-sm font-bold">
-                                -{item?.discount}%
+                                -{item?.discount}/-
                               </span>
                             </td>
 

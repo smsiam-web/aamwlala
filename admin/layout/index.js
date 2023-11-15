@@ -1,16 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import styles from "./styles/Body.module.css";
 import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
 
 const AdminWrapper = ({ children }) => {
   const router = useRouter();
   const [sidebarActive, setSidebarActive] = useState(true);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    router.push("/admin");
-  }, []);
+  // useEffect(() => {
+  //   router.push("/admin");
+  // }, []);
+
 
   return (
     <div className={styles.body + " " + styles.light}>

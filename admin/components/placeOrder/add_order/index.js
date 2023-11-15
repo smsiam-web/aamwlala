@@ -106,10 +106,8 @@ const AddOrder = ({ onClick }) => {
       });
 
     const discount =
-      totalPrice - values.salePrice > 0
-        ? Math.round(((totalPrice - values.salePrice) / totalPrice) * 100)
-        : "0";
-    values.salePrice += values.delivery_type ? 120 : 80;
+      totalPrice - values.salePrice > 0 ? totalPrice - values?.salePrice : "0";
+    // values.salePrice += values.delivery_type ? 120 : 80;
     const invoice_id = Number(uid?.invoice_id) + 1;
     const invoice_str = `RA0${invoice_id}`;
     const cusetomer_id = `RAC0${invoice_id}`;

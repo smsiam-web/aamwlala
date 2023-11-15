@@ -11,7 +11,6 @@ const AdmainMain = () => {
 
     // Get order from firebase database
     useEffect(() => {
- 
       const unSub = db
         .collection("placeOrder")
         .orderBy("timestamp", "desc")
@@ -30,7 +29,8 @@ const AdmainMain = () => {
       return () => {
         unSub();
       };
-    }, []);
+    }, []);    
+
   return (
     <AdminLayout>
       <DashBoard />

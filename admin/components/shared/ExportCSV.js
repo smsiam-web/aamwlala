@@ -37,7 +37,7 @@ const ExportCSV = ({item}) => {
             Name: item.customer_details.customer_name,
             Address: item.customer_details.customer_address,
             Phone: item.customer_details.phone_number,
-            Amount: item.totalPrice,
+            Amount: item.customer_details.salePrice,
             Note: item.customer_details.delivery_type ? "Home Delivery" : "Point Delivery"
         }
         SS.push(i);

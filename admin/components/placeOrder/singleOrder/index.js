@@ -225,7 +225,7 @@ const OrderDetails = ({ onClick, item }) => {
                   id="discount"
                   className="text-sm sm:text-xl md:text-2xl text-title font-mono"
                 >
-                  -{singleOrder?.discount}%
+                  -{singleOrder?.discount}/-
                 </h1>
               </div>
               <div className="flex w-full px-4 py-1 justify-between mt-2 rounded-sm bg-blue-200 ">
