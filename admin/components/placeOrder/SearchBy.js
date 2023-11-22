@@ -94,14 +94,19 @@ const SearchBy = ({ onClick }) => {
         date.getDate() - dateAgo < 1 &&
         date.getMonth() - 1 === item.timestamp.toDate().getMonth()
       ) {
-        if(item.timestamp.toDate().getDate() >= (daysInMonth(date.getMonth() - 1, date.getFullYear()) +
-        date.getDate()) -
-        dateAgo){
-          limits.push(item)
+        if (
+          item.timestamp.toDate().getDate() >=
+          daysInMonth(date.getMonth() - 1, date.getFullYear()) +
+            date.getDate() -
+            dateAgo
+        ) {
+          limits.push(item);
         }
       }
     });
-    limits.length ? dispatch(updateOrder(limits)) : dispatch(updateOrder(orders));
+    limits.length
+      ? dispatch(updateOrder(limits))
+      : dispatch(updateOrder(orders));
   };
 
   // Get Order details from firebase and update on REDUX
@@ -154,6 +159,7 @@ const SearchBy = ({ onClick }) => {
                 <option value="Processing">Processing</option>
                 <option value="Shipped">Shipped</option>
                 <option value="Delivered">Delivered</option>
+                <option value="Hold">Hold</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
             </div>

@@ -257,6 +257,9 @@ const OrderTable = () => {
                                     item.status.toLowerCase() === "pending" &&
                                     "text-gray-700 bg-gray-200"
                                   } ${
+                                    item.status.toLowerCase() === "hold" &&
+                                    "text-gray-700 bg-gray-200"
+                                  } ${
                                     item.status.toLowerCase() ===
                                       "processing" &&
                                     "text-yellow-500 bg-yellow-100"
@@ -292,6 +295,7 @@ const OrderTable = () => {
                                 <option value="Processing">Processing</option>
                                 <option value="Shipped">Shipped</option>
                                 <option value="Delivered">Delivered</option>
+                                <option value="Hold">Hold</option>
                                 <option value="Cancelled">Cancelled</option>
                               </select>
                             </td>
