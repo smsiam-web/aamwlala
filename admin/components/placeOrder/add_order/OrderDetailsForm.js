@@ -4,7 +4,10 @@ import { AppTextArea, FormInput, FormRadio } from "../../shared/Form";
 import { db } from "@/app/utils/firebase";
 
 const OrderDetailsForm = () => {
-  const [products, setProducts] = useState(null);
+  const [khejurGur, setKhejurGur] = useState(null);
+  const [honey, setHoney] = useState(null);
+  const [mosla, setMosla] = useState(null);
+  const [other, setOthers] = useState(null);
 
   // Get products from firebase database
   useEffect(() => {
@@ -12,14 +15,32 @@ const OrderDetailsForm = () => {
       .collection("products")
       .orderBy("timestamp", "desc")
       .onSnapshot((snap) => {
-        const product = [];
+        const khejur = [];
+        const honeys = [];
+        const moslagura = [];
+        const others = [];
         snap.docs.map((doc) => {
           doc.data().product_details.parent_category === "খেজুরের গুড়" &&
-            product.push({
+          khejur.push({
               ...doc.data().product_details,
             });
+            doc.data().product_details.parent_category === "মধু" &&
+            honeys.push({
+                ...doc.data().product_details,
+              });
+            doc.data().product_details.parent_category === "মশলা গুঁড়া" &&
+            moslagura.push({
+                ...doc.data().product_details,
+              });
+           ( doc.data().product_details.parent_category === "সরিষার তেল" || doc.data().product_details.parent_category === "ঘি" || doc.data().product_details.parent_category === "কুমড়া বড়ি") &&
+            others.push({
+                ...doc.data().product_details,
+              });
         });
-        setProducts(product);
+        setKhejurGur(khejur);
+        setHoney(honeys);
+        setMosla(moslagura);
+        setOthers(others)
       });
 
     return () => {
@@ -63,16 +84,17 @@ const OrderDetailsForm = () => {
         />
       </div>
       <div>
-        <Tabs color="violet" defaultValue="gallery" variant="pills">
+        <Tabs color="violet" defaultValue="khejurGur" variant="pills">
           <Tabs.List>
-            <Tabs.Tab value="gallery">খেজুরের গুড়</Tabs.Tab>
-            <Tabs.Tab value="messages">আম</Tabs.Tab>
-            <Tabs.Tab value="settings">মধু</Tabs.Tab>
+            <Tabs.Tab value="khejurGur">খেজুরের গুড়</Tabs.Tab>
+            <Tabs.Tab value="honey">মধু</Tabs.Tab>
+            <Tabs.Tab value="mosla">মশলা গুঁড়া</Tabs.Tab>
+            <Tabs.Tab value="others">অন্যান্য</Tabs.Tab>
           </Tabs.List>
 
-          <Tabs.Panel value="gallery" pt="xs">
+          <Tabs.Panel value="khejurGur" pt="xs">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {products?.map((i) => (
+              {khejurGur?.map((i) => (
                 <div
                   key={i.yup}
                   className="p-2 bg-blue-500 rounded-md col-span-1"
@@ -91,12 +113,66 @@ const OrderDetailsForm = () => {
             </div>
           </Tabs.Panel>
 
-          <Tabs.Panel value="messages" pt="xs">
-           Development mode
+          <Tabs.Panel value="others" pt="xs">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {other?.map((i) => (
+                <div
+                  key={i.yup}
+                  className="p-2 bg-blue-500 rounded-md col-span-1"
+                >
+                  <span className="pb-10 text-lg text-white">
+                    #{i.child_category}
+                  </span>
+                  <div className="flex items-center pt-1 sm:pt-2">
+                    <div className="w-2/3">
+                      <FormInput type="number" name={i.yup} placeholder="" />
+                    </div>
+                    <span className="text-lg text-white font-bold">.kg</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </Tabs.Panel>
 
-          <Tabs.Panel value="settings" pt="xs">
-            Settings tab content
+          <Tabs.Panel value="honey" pt="xs">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {honey?.map((i) => (
+                <div
+                  key={i.yup}
+                  className="p-2 bg-blue-500 rounded-md col-span-1"
+                >
+                  <span className="pb-10 text-lg text-white">
+                    #{i.child_category}
+                  </span>
+                  <div className="flex items-center pt-1 sm:pt-2">
+                    <div className="w-2/3">
+                      <FormInput type="number" name={i.yup} placeholder="" />
+                    </div>
+                    <span className="text-lg text-white font-bold">.kg</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Tabs.Panel>
+          <Tabs.Panel value="mosla" pt="xs">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {mosla?.map((i) => (
+                <div
+                  key={i.yup}
+                  className="p-2 bg-blue-500 rounded-md col-span-1"
+                >
+                  <span className="pb-10 text-lg text-white">
+                    #{i.child_category}
+                  </span>
+                  <div className="flex items-center pt-1 sm:pt-2">
+                    <div className="w-2/3">
+                      <FormInput type="number" name={i.yup} placeholder="" />
+                    </div>
+                    <span className="text-lg text-white font-bold">.kg</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </Tabs.Panel>
         </Tabs>
       </div>
