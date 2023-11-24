@@ -136,8 +136,8 @@ const AddOrder = ({ onClick }) => {
       timestamp
     );
     await createCustomer(values, date, cusetomer_id, timestamp);
-    // router.push("/admin/place-order/id=" + invoice_str);
-    // sendConfirmationMsg(values, invoice_str, config);
+    router.push("/admin/place-order/id=" + invoice_str);
+    sendConfirmationMsg(values, invoice_str, config);
     setLoading(false);
   };
 
