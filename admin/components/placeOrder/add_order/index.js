@@ -61,7 +61,7 @@ const AddOrder = ({ onClick }) => {
       .onSnapshot((snap) => {
         const product = [];
         snap.docs.map((doc) => {
-          doc.data().product_details.parent_category === "খেজুরের গুড়" &&
+          // doc.data().product_details.parent_category === "খেজুরের গুড়" &&
             product.push({
               ...doc.data().product_details,
             });
@@ -114,6 +114,8 @@ const AddOrder = ({ onClick }) => {
       order.map((p) => {
         totalPrice += p.total_price;
       });
+
+      console.log(order)
 
     const deliveryCrg =
       weight >= 1 && weight === 1 ? 130 : 130 + (weight - 1) * 20;
