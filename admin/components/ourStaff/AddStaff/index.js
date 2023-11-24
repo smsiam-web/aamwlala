@@ -45,7 +45,7 @@ const AddStaff = ({ onClick }) => {
         }
       });
 
-    router.push("/admin/our-staff/id=?" + staff_id);
+    router.push("/admin/our-staff/id=" + staff_id);
     setLoading(false);
     notifications.show({
       title: "Staff Added Sucessfully",

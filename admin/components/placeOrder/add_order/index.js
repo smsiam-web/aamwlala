@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import { selectUser } from "@/app/redux/slices/authSlice";
 import { Today } from "@/admin/utils/helpers";
 import { selectConfig } from "@/app/redux/slices/configSlice";
-import axios from 'axios';
+import axios from "axios";
 
 const validationSchema = Yup.object().shape({
   delivery_type: Yup.boolean().required().label("Delivery type"),
@@ -38,19 +38,20 @@ const AddOrder = ({ onClick }) => {
   const [products, setProducts] = useState(null);
   const [uid, setInvoiceID] = useState(null);
 
-console.log(uid?.invoice_id)
-    // Get products from firebase database
-    useEffect(() => {
-      const unSub = db.collection("orderID").onSnapshot((snap) => {
-        snap.docs.map((doc) => {
-          setInvoiceID(doc.data());
-        });
+  // Get products from firebase database
+  useEffect(() => {
+    const unSub = db.collection("orderID").onSnapshot((snap) => {
+      snap.docs.map((doc) => {
+        setInvoiceID(doc.data());
       });
-  
-      return () => {
-        unSub();
-      };
-    }, []);
+    });
+
+    return () => {
+      unSub();
+    };
+  }, []);
+
+  console.log(uid?.invoice_id);
 
   // Get products from firebase database
   useEffect(() => {
@@ -77,12 +78,13 @@ console.log(uid?.invoice_id)
   const placeOrder = async (values) => {
     setLoading(true);
     const invoice_id = Number(uid?.invoice_id) + 1;
-    await updateInvoiceID(invoice_id);
     const invoice_str = `RA0${invoice_id}`;
     const cusetomer_id = `RAC0${invoice_id}`;
+    await updateInvoiceID(invoice_id);
 
     const order = [];
     let totalPrice = 0;
+    let weight = 0;
 
     products &&
       products.map((item) => {
@@ -96,6 +98,8 @@ console.log(uid?.invoice_id)
             title.map((e) => {
               s.push(e[0].toUpperCase() + e.slice(1));
             });
+
+          weight += values[yup];
 
           order.push({
             title: s.join(" "),
@@ -111,12 +115,18 @@ console.log(uid?.invoice_id)
         totalPrice += p.total_price;
       });
 
-    const temp =  values.delivery_type ? totalPrice + 120 : totalPrice + 80;
-    const discount = temp - values.salePrice > 0 ? temp - values?.salePrice : "0";
+    const deliveryCrg =
+      weight >= 1 && weight === 1 ? 130 : 130 + (weight - 1) * 20;
+    const discount =
+      totalPrice + deliveryCrg - values.salePrice > 0
+        ? totalPrice + deliveryCrg - values?.salePrice
+        : "0";
 
     const date = Today();
 
     await placeOrderHandler(
+      deliveryCrg,
+      weight,
       values,
       discount,
       totalPrice,
@@ -126,36 +136,35 @@ console.log(uid?.invoice_id)
       timestamp
     );
     await createCustomer(values, date, cusetomer_id, timestamp);
-    router.push("/admin/place-order/id=" + invoice_str);
-    sendConfirmationMsg(values, invoice_str, config);
+    // router.push("/admin/place-order/id=" + invoice_str);
+    // sendConfirmationMsg(values, invoice_str, config);
     setLoading(false);
   };
-  
 
   const sendConfirmationMsg = async (values, invoice_str) => {
     const customer_name = values?.customer_name || "Customer";
-    const company_name = config[0]?.values.company_name;   
-    const company_contact = config[0]?.values.company_contact;  
-   
-      const url = "https://api.sms.net.bd/sendsms";
-      const apiKey = config[0]?.values.bulk_auth;
-      const message = `Dear ${customer_name}, Your order has been successfully placed at ${company_name}. Invoice No: ${invoice_str}. Please keep BDT: ${values?.salePrice}tk ready while receiving the parcel. Hotline: +88${company_contact}. Thanks for being with us.`;
-      const to = values?.phone_number; 
+    const company_name = config[0]?.values.company_name;
+    const company_contact = config[0]?.values.company_contact;
 
-      const formData = new FormData();
-      formData.append('api_key', apiKey);
-      formData.append('msg', message);
-      formData.append('to', to);
-    
-      axios.post(url, formData)
-        .then(response => {
-          console.log(response.data);
-        })
-        .catch(error => {
-          throw new Error(error);
-        });
-      
-    }
+    const url = "https://api.sms.net.bd/sendsms";
+    const apiKey = config[0]?.values.bulk_auth;
+    const message = `Dear ${customer_name}, Your order has been successfully placed at ${company_name}. Invoice No: ${invoice_str}. Please keep BDT: ${values?.salePrice}tk ready while receiving the parcel. Hotline: +88${company_contact}. Thanks for being with us.`;
+    const to = values?.phone_number;
+
+    const formData = new FormData();
+    formData.append("api_key", apiKey);
+    formData.append("msg", message);
+    formData.append("to", to);
+
+    axios
+      .post(url, formData)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
+  };
   // create Customer on firebase database
   const createCustomer = async (values, date, cusetomer_id, timestamp) => {
     await db.collection("createCustomer").doc(values.phone_number).set({
@@ -170,6 +179,8 @@ console.log(uid?.invoice_id)
 
   // save order details on firebase database
   const placeOrderHandler = async (
+    deliveryCrg,
+    weight,
     values,
     discount,
     totalPrice,
@@ -179,6 +190,8 @@ console.log(uid?.invoice_id)
     timestamp
   ) => {
     await db.collection("placeOrder").doc(invoice_str).set({
+      deliveryCrg,
+      weight,
       customer_details: values,
       discount,
       totalPrice,

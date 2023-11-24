@@ -56,8 +56,18 @@ const SingleStaff = () => {
 
   // save order details on firebase database
   const updateStaffHandler = async (staff, values, staff_id) => {
-    await db.collection("ourStaff").doc(staff_id).set({
-      
+    await db.collection("users").doc(staff?.uid).set({   
+      authKey: staff.authKey,
+      email: staff.email,
+      image: staff.image,
+      name: values.staff_name,
+      phone: values.staff_contact,
+      staff_id,
+      staff_role: values.staff_role,
+      uid: staff.uid,
+      timestamp: staff.timestamp,
+    });
+    await db.collection("ourStaff").doc(staff_id).set({   
       authKey: staff.authKey,
       email: staff.email,
       image: staff.image,

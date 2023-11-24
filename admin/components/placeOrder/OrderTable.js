@@ -15,6 +15,7 @@ import Button from "../shared/Button";
 import NotFound from "../shared/NotFound";
 import { AiOutlinePrinter } from "react-icons/ai";
 import { invoiceGenerate } from "@/admin/utils/helpers";
+import { selectUser } from "@/app/redux/slices/authSlice";
 
 const OrderTable = () => {
   const [loading, setLoading] = useState(false);
@@ -24,6 +25,10 @@ const OrderTable = () => {
   const [page, setPagee] = useState(1);
   const [opened, setOpened] = useState(false);
   const order = useSelector(selectOrder);
+  const user = useSelector(selectUser);
+
+  console.log(user.staff_role);
+
   const toggleOpen = () => {
     opened ? setOpened(false) : setOpened(true);
   };
@@ -184,7 +189,7 @@ const OrderTable = () => {
                   <th className="px-4 py-3 ">DISCOUNT</th>
                   <th className="px-4 py-3 ">Amount</th>
                   <th className="px-4 py-3 ">status</th>
-                  <th className="px-4 py-3 ">Actions</th>
+                  <th className={`px-4 py-3 ${user.staff_role === "HR" || user.staff_role == "Admin" ? "" : "hidden"}`}>Actions</th>
                   <th className="px-4 py-3 ">Created at</th>
                   <th className="px-4 py-3 ">Created By</th>
                   <th className="px-4 py-3 ">invoice</th>
@@ -278,7 +283,7 @@ const OrderTable = () => {
                                 </span>
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-center">
+                            <td className={`px-4 py-3 text-center ${user.staff_role === "HR" || user.staff_role == "Admin" ? "" : "hidden"}`}>
                               <select
                                 className="block cursor-pointer  px-2 py-1  focus:outline-none  form-select  border-gray-200  focus:shadow-none focus:ring  leading-5 border  bg-gray-50 h-8 rounded-md text-xs w-28"
                                 onChange={(e) => onStatusChanged(e, item.id)}

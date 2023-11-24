@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const SingleStaff = () => {
   const [staff, setStaff] = useState([]);
-  const [id, setId] = useState(usePathname().split("=")[1]);
+  const [id, setId] = useState(usePathname()?.split("=")[1]);
   const staffs = useSelector(selectStaff);
 
   useEffect(() => {

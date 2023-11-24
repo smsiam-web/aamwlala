@@ -19,6 +19,8 @@ const OrderDetails = ({ onClick, item }) => {
   const [singleOrder, setSingleOrder] = useState(item || null);
   const [disabled, setDisabled] = useState(true);
 
+
+
   useEffect(() => {
     !singleOrder && orders &&
     orders?.map((item) => {
@@ -214,7 +216,7 @@ const OrderDetails = ({ onClick, item }) => {
                   id="shipping_cost"
                   className="text-sm sm:text-xl md:text-2xl text-title font-mono"
                 >
-                  120/-
+                  {singleOrder?.deliveryCrg ? singleOrder?.deliveryCrg : "150"}/-
                 </h1>
               </div>
               <div className="flex w-full px-4 py-1 justify-between">
