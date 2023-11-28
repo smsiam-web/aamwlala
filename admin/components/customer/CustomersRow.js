@@ -17,20 +17,20 @@ const CustomersRow = () => {
   };
 
   // Get customer from firebase database
-  useEffect(() => {
-    const unSub = db.collection("createCustomer").onSnapshot((snap) => {
-      const customer = [];
-      snap.docs.map((doc) => {
-        customer.push({
-          ...doc.data(),
-        });
-      });
-      setCustomer(customer);
-    });
-    return () => {
-      unSub();
-    };
-  }, []);
+  // useEffect(() => {
+  //   const unSub = db.collection("createCustomer").onSnapshot((snap) => {
+  //     const customer = [];
+  //     snap.docs.map((doc) => {
+  //       customer.push({
+  //         ...doc.data(),
+  //       });
+  //     });
+  //     setCustomer(customer);
+  //   });
+  //   return () => {
+  //     unSub();
+  //   };
+  // }, []);
 
   return (
     <main>

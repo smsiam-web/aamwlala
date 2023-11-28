@@ -109,27 +109,27 @@ const SearchBy = ({ onClick }) => {
       : dispatch(updateOrder(orders));
   };
 
-  // Get Order details from firebase and update on REDUX
-  useEffect(() => {
-    const unSub = db
-      .collection("placeOrder")
-      .orderBy("timestamp", "desc")
-      .onSnapshot((snap) => {
-        const getOrder = [];
-        snap.docs.map((doc) => {
-          getOrder.push({
-            id: doc.id,
-            ...doc.data(),
-            // timestamp: doc.data().timestamp?.toDate()?.getTime(),
-          });
-        });
-        setOrders(getOrder);
-      });
+  // // Get Order details from firebase and update on REDUX
+  // useEffect(() => {
+  //   const unSub = db
+  //     .collection("placeOrder")
+  //     .orderBy("timestamp", "desc")
+  //     .onSnapshot((snap) => {
+  //       const getOrder = [];
+  //       snap.docs.map((doc) => {
+  //         getOrder.push({
+  //           id: doc.id,
+  //           ...doc.data(),
+  //           // timestamp: doc.data().timestamp?.toDate()?.getTime(),
+  //         });
+  //       });
+  //       setOrders(getOrder);
+  //     });
 
-    return () => {
-      unSub();
-    };
-  }, []);
+  //   return () => {
+  //     unSub();
+  //   };
+  // }, []);
 
   return (
     <>

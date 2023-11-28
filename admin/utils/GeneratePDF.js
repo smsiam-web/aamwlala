@@ -5,10 +5,13 @@ import Button from "../components/shared/Button";
 import { AiOutlinePrinter } from "react-icons/ai";
 import { BsCloudDownload } from "react-icons/bs";
 
-const GeneratePdf = ({ html, disabled }) => {
-  const generate = () => {
+const GeneratePdf = ({ html, disabled, item, id }) => {
+  const generate = (e) => {
+    e.stopPropagation()
     generateInvoice();
   };
+
+  console.log(item, id)
 
   const generateInvoice = () => {
     const doc = new jsPDF();
@@ -213,7 +216,6 @@ const GeneratePdf = ({ html, disabled }) => {
       var link = document.createElement("a");
       link.download = invoiceNo?.innerText;
       link.href = dataUrl;
-      console.log(dataUrl)
       link.click();
     });
   };
@@ -237,7 +239,7 @@ const GeneratePdf = ({ html, disabled }) => {
           <div className="col-span-2 sm:col-span-1">
             <Button
               icon={<AiOutlinePrinter size={26} />}
-              onClick={generate}
+              onClick={() => generate}
               title="Print Invoice"
               className="bg-sky-400 font-medium  hover:bg-sky-500 hover:shadow-lg transition-all duration-300 text-white w-full h-14 text-md sm:text-lg "
             />
