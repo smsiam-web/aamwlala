@@ -11,24 +11,22 @@ import { selectConfig, updateConfig } from "@/app/redux/slices/configSlice";
 
 const DashBoard = () => {
 
-  const dispatch = useDispatch();
-  const config = useSelector(selectConfig);
-
-    // Get config from firebase database
-    useEffect(() => {
-      const unSub = db.collection("config").onSnapshot((snap) => {
-        const configData = [];
-        snap.docs.map((doc) => {
-          configData.push(
-            doc.data()
-          )
-        });
-        dispatch(updateConfig(configData));
-      });
-      return () => {
-        unSub();
-      };
-    }, []);
+  // const dispatch = useDispatch();
+  //   // Get config from firebase database
+  //   useEffect(() => {
+  //     const unSub = db.collection("config").onSnapshot((snap) => {
+  //       const configData = [];
+  //       snap.docs.map((doc) => {
+  //         configData.push(
+  //           doc.data()
+  //         )
+  //       });
+  //       dispatch(updateConfig(configData));
+  //     });
+  //     return () => {
+  //       unSub();
+  //     };
+  //   }, []);
 
   return (
     <main className="h-full overflow-y-auto">

@@ -14,12 +14,13 @@ import FormHeader from "../shared/FormHeader";
 import Button from "../shared/Button";
 import NotFound from "../shared/NotFound";
 import { AiOutlinePrinter } from "react-icons/ai";
-import { useBarcode } from 'next-barcode';
+import { useBarcode } from "next-barcode";
 import { selectUser } from "@/app/redux/slices/authSlice";
 import dynamic from "next/dynamic";
-import GenerateStick from "@/admin/utils/GenerateSticker";
-import { HelperPDF } from "@/admin/utils/HelperPDF";
-import { invoiceGenerate } from "@/admin/utils/helpers";
+
+import { generateStick, invoiceGenerate } from "@/admin/utils/helpers";
+import { FaPrint } from "react-icons/fa";
+import { selectConfig, updateConfig } from "@/app/redux/slices/configSlice";
 
 const GeneratePDF = dynamic(() => import("../../utils/GeneratePDF"), {
   ssr: false,
@@ -35,19 +36,11 @@ const OrderTable = () => {
   const order = useSelector(selectOrder);
   const user = useSelector(selectUser);
 
-  // const ref = useRef();
-  // const toggleOpen = () => {
-  //   opened ? setOpened(false) : setOpened(true);
-  // };
-  // const { inputRef } = useBarcode({
-  //   value: "RA014296",
-  //   options: {
-  //     background: '#FFFFFF',
-  //     displayValue: false,
-  //     width: 3,
-  //     height: 80,
-  //   }
-  // });
+  const toggleOpen = () => {
+    opened ? setOpened(false) : setOpened(true)
+  }
+
+  const ref = useRef();
 
 
   useEffect(() => {
@@ -57,8 +50,13 @@ const OrderTable = () => {
   const setPage = (i) => {
     setPagee(i);
   };
+  // const [config, setConfig] = useState();
 
-  console.log(page);
+  // const data = useSelector(selectConfig);
+  
+  // useEffect(() => {
+  //   !!data && setConfig(data[0].values);
+  // }, []);
 
   // Change Status from status Action
   const onStatusChanged = async (e, id) => {
@@ -70,13 +68,23 @@ const OrderTable = () => {
   };
   // Change Status from print Action and check print Status
   const statusUpdate = async (item) => {
-    // (await (item.status === "Pending"))
-    //   ? updateStatus(item, "Processing", item.id)
-    //   : toggleOpen(item),
-    //   setFilterOrder(item);
+    item.status === "Pending" && invoiceGenerate(item);
+
+    item.status === "Pending"
+      ? updateStatus(item, "Processing", item?.id)
+      : toggleOpen;
+        setFilterOrder(item);
     //   console.log(item);
-      invoiceGenerate(item);
-    // invoiceGenerate(item);
+  };
+  // Change Status from print Action and check print Status
+  const stickerStatus = async (item) => {
+    item.status === "Processing" && generateStick(item);
+
+    item.status === "Processing"
+      ? updateStatus(item, "Shipped", item?.id)
+      : toggleOpen;
+        setFilterOrder(item);
+    //   console.log(item);
   };
 
   // update status on firebase
@@ -100,23 +108,40 @@ const OrderTable = () => {
   };
 
   // Get order from firebase database
+  useEffect(() => {
+    setLoading(true);
+    const unSub = db
+      .collection("placeOrder")
+      .orderBy("timestamp", "desc")
+      .limit(10)
+      .onSnapshot((snap) => {
+        const order = [];
+        snap.docs.map((doc) => {
+          order.push({
+            id: doc.id,
+            ...doc.data(),
+            // timestamp: doc.data().timestamp?.toDate().getTime(),
+          });
+        });
+        dispatch(updateOrder(order));
+        setLoading(false);
+      });
+    return () => {
+      unSub();
+    };
+  }, []);
+
+  // //get config
   // useEffect(() => {
-  //   setLoading(true);
-  //   const unSub = db
-  //     .collection("placeOrder")
-  //     .orderBy("timestamp", "desc")
-  //     .onSnapshot((snap) => {
-  //       const order = [];
-  //       snap.docs.map((doc) => {
-  //         order.push({
-  //           id: doc.id,
-  //           ...doc.data(),
-  //           // timestamp: doc.data().timestamp?.toDate().getTime(),
-  //         });
-  //       });
-  //       dispatch(updateOrder(order));
-  //       setLoading(false);
+  //   const unSub = db.collection("config").onSnapshot((snap) => {
+  //     const configData = [];
+  //     snap.docs.map((doc) => {
+  //       configData.push(
+  //         doc.data()
+  //       )
   //     });
+  //     dispatch(updateConfig(configData));
+  //   });
   //   return () => {
   //     unSub();
   //   };
@@ -205,7 +230,6 @@ const OrderTable = () => {
                   <th className="px-4 py-3 ">invoice no</th>
                   <th className="px-4 py-3 ">NAME</th>
                   <th className="px-4 py-3 ">Phone no.</th>
-                  {/* <th className="px-4 py-3 ">address</th> */}
                   <th className="px-4 py-3 ">Delivery Type</th>
                   <th className="px-4 py-3 ">DISCOUNT</th>
                   <th className="px-4 py-3 ">Amount</th>
@@ -364,100 +388,30 @@ const OrderTable = () => {
 
                             <td className="px-4 py-3">
                               <div className="text-sm font-semibold flex justify-start gap-5 text-sub-title items-center">
+                              <Tooltip label="Sticker" color="blue" withArrow>
+                                  <span className="cursor-pointer hover:text-blue-400"
+                                  onClick={() => stickerStatus(item)} >
+                                    <FaPrint size={16} />
+                                  </span>
+                                </Tooltip>
+
                                 <Link
                                   href={`/admin/orders/edit-order/id=${item.id}`}
                                 >
                                   <Tooltip label="Edit" color="blue" withArrow>
-                                    <span className="cursor-pointer hover:text-blue-400">
-                                      <FiEdit size={16} />
-                                    </span>
-                                  </Tooltip>
+                                  <span className="cursor-pointer hover:text-blue-400" >
+                                    <FiEdit size={16} />
+                                  </span>
+                                </Tooltip>
                                 </Link>
+                                
+
                                 <Tooltip label="Print" color="green" withArrow>
                                   <span
                                     className="cursor-pointer hover:text-blue-400"
                                     onClick={() => statusUpdate(item)}
                                   >
                                     <AiOutlinePrinter size={20} />
-                                    {/* <div ref={ref} >
-                                    <img id="bar_code" ref={inputRef} className="hidden" />
-                                      <img
-                                        id="image"
-                                        src="/invoice/invoice.jpg"
-                                        width="300"
-                                        height="200"
-                                        className="hidden"
-                                      />
-
-                                      <span id="invoiceNo">{item?.id}</span>
-
-                                      <span id="status">{item?.status}.</span>
-
-                                      <span id="name">
-                                        {item?.customer_details.customer_name}
-                                      </span>
-
-                                      <span id="phone">
-                                        {item?.customer_details.phone_number}
-                                      </span>
-
-                                      <span id="address">
-                                        {
-                                          item?.customer_details
-                                            .customer_address
-                                        }
-                                      </span>
-
-                                      {item &&
-                                        item.order.map((e, i) => (
-                                          <div key={i}>
-                                            <h2 id={`item_0${++i}`}>
-                                              {e.title}
-                                            </h2>
-
-                                            <span id={`item_0${i}_quantity`}>
-                                              {e.quantity}kg
-                                            </span>
-                                            <span id={`item_0${i}_price`}>
-                                              {e.price}
-                                            </span>
-                                            <span id={`item_0${i}_total_price`}>
-                                              {e.total_price}/-
-                                            </span>
-                                          </div>
-                                        ))}
-
-                                      <h1 id="subTotal">
-                                        {item?.totalPrice}/-
-                                      </h1>
-
-                                      <h1 id="shipping_type">
-                                        {item?.customer_details?.delivery_type
-                                          ? "HOME"
-                                          : "POINT"}
-                                      </h1>
-                                      <h1 id="shipping_cost">
-                                        {item?.deliveryCrg
-                                          ? item?.deliveryCrg
-                                          : "150"}
-                                        /-
-                                      </h1>
-
-                                      <h1 id="discount">-{item?.discount}/-</h1>
-
-                                      <h1 id="total">
-                                        {item?.customer_details?.salePrice}
-                                        .00/-
-                                      </h1>
-                                    </div>
-                                  <GeneratePDF
-                                    html={ref}
-                                    disabled={true}
-                                    item={item}
-                                    id={item.id}
-                                    // onClick={() => jsxToPng(null)}
-                                  />
-                                  <GenerateStick html={ref} /> */}
                                   </span>
                                 </Tooltip>
                               </div>

@@ -26,7 +26,6 @@ const Setting = () => {
 
   const lastUpdate = ToDateAndTime(config[0].created_at);
   let today = new Date();
-  console.log( config[0].created_at.toDate().toDateString())
 
   // place product handler on submit
   const placeConfig = async (values) => {

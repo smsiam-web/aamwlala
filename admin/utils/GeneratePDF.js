@@ -11,8 +11,6 @@ const GeneratePdf = ({ html, disabled, item, id }) => {
     generateInvoice();
   };
 
-  console.log(item, id)
-
   const generateInvoice = () => {
     const doc = new jsPDF();
 

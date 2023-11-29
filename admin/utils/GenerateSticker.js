@@ -6,7 +6,9 @@ import { selectConfig } from "@/app/redux/slices/configSlice";
 
 const GenerateStick = ({ html }) => {
   const [config, setConfig] = useState();
+
   const data = useSelector(selectConfig);
+  
   useEffect(() => {
     !!data && setConfig(data[0].values);
   }, []);

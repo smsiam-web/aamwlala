@@ -1,5 +1,8 @@
+import React, {useEffect, useState} from "react";
+import { selectConfig } from "@/app/redux/slices/configSlice";
 import { jsPDF } from "jspdf";
-import { useState } from "react";
+import { useBarcode } from 'next-barcode';
+import { useSelector } from "react-redux";
 
 // create random unique id
 export const uuid = () => {
@@ -174,43 +177,69 @@ export const daysInMonth = (month, year) => {
 export const invoiceGenerate = (item) => {
   const doc = new jsPDF();
 
-  //     // get item_01
-  // let item_01 = doc.splitTextToSize(
-  //   document.getElementById("item_01").innerText || "",
-  //   200
-  // );
-  // let item_01_quantity = doc.splitTextToSize(
-  //   document.getElementById("item_01_quantity")?.innerText || "",
-  //   200
-  // );
-  // let item_01_price = doc.splitTextToSize(
-  //   document.getElementById("item_01_price")?.innerText || "",
-  //   200
-  // );
-  // let item_01_total_price = doc.splitTextToSize(
-  //   document.getElementById("item_01_total_price")?.innerText || "",
-  //   200
-  // );
+  let item_01 = "",
+    item_01_quantity = "",
+    item_01_price = "",
+    item_01_total_price = "",
+    item_02 = "",
+    item_02_quantity = "",
+    item_02_price = "",
+    item_02_total_price = "",
+    item_03 = "",
+    item_03_quantity = "",
+    item_03_price = "",
+    item_03_total_price = "",
+    item_04 = "",
+    item_04_quantity = "",
+    item_04_price = "",
+    item_04_total_price = "",
+    item_05 = "",
+    item_05_quantity = "",
+    item_05_price = "",
+    item_05_total_price = "",
+    item_06 = "",
+    item_06_quantity = "",
+    item_06_price = "",
+    item_06_total_price = "";
 
-  let item_01, item_01_quantity, item_01_price, item_01_total_price;
 
-  console.log(
     item.order.map((e, i) => {
-      i++
-      console.log(e, i)
-         item_01 = e.title || ""
+      i++;
 
-   item_01_quantity = `"${e.quantity}"`
-
-   item_01_price = [(e.price)]
-   item_01_total_price = `"${e.total_price}"`
-
-   console.log(e.total_price)
-
+      if (i === 1) {
+        item_01 = e.title || "";
+        item_01_quantity = `${e.quantity}`;
+        item_01_price = [e.price];
+        item_01_total_price = `${e.total_price}/-`;
+      } else if (i === 2) {
+        item_02 = e.title || "";
+        item_02_quantity = `${e.quantity}`;
+        item_02_price = [e.price];
+        item_02_total_price = `${e.total_price}/-`;
+      } else if (i === 3) {
+        item_03 = e.title || "";
+        item_03_quantity = `${e.quantity}`;
+        item_03_price = [e.price];
+        item_03_total_price = `${e.total_price}/-`;
+      } else if (i === 4) {
+        item_04 = e.title || "";
+        item_04_quantity = `${e.quantity}`;
+        item_04_price = [e.price];
+        item_04_total_price = `${e.total_price}/-`;
+      } else if (i === 5) {
+        item_05 = e.title || "";
+        item_05_quantity = `${e.quantity}`;
+        item_05_price = [e.price];
+        item_05_total_price = `${e.total_price}/-`;
+      } else if (i === 6) {
+        item_06 = e.title || "";
+        item_06_quantity = `${e.quantity}`;
+        item_06_price = [e.price];
+        item_06_total_price = `${e.total_price}/-`;
+      }
     })
-  );
 
-  // doc.text(document.querySelector(".content > h1").innerHTML, 5, 75);
+  // doc.text(document.querySelector(".content > h2").innerHTML, 5, 75);
   doc.addImage("/invoice/invoice.jpg", 0, 0, 210, 297);
   doc.text(item?.id, 43, 83.5);
   doc.text(item?.status, 91, 77);
@@ -223,37 +252,82 @@ export const invoiceGenerate = (item) => {
   doc.text(item_01_price, 137, 139.6);
   doc.text(item_01_total_price, 168, 139.6);
 
-  // doc.text(item_02, 30, 154);
-  // doc.text(item_02_quantity, 116, 154);
-  // doc.text(item_02_price, 137, 154);
-  // doc.text(item_02_total_price, 168, 154);
+  doc.text(item_02, 30, 154);
+  doc.text(item_02_quantity, 116, 154);
+  doc.text(item_02_price, 137, 154);
+  doc.text(item_02_total_price, 168, 154);
 
-  // doc.text(item_03, 30, 167);
-  // doc.text(item_03_quantity, 116, 167);
-  // doc.text(item_03_price, 137, 167);
-  // doc.text(item_03_total_price, 168, 167);
+  doc.text(item_03, 30, 167);
+  doc.text(item_03_quantity, 116, 167);
+  doc.text(item_03_price, 137, 167);
+  doc.text(item_03_total_price, 168, 167);
 
-  // doc.text(item_04, 30, 180.8);
-  // doc.text(item_04_quantity, 116, 180.8);
-  // doc.text(item_04_price, 137, 180.8);
-  // doc.text(item_04_total_price, 168, 180.8);
+  doc.text(item_04, 30, 180.8);
+  doc.text(item_04_quantity, 116, 180.8);
+  doc.text(item_04_price, 137, 180.8);
+  doc.text(item_04_total_price, 168, 180.8);
 
-  // doc.text(item_05, 30, 194.6);
-  // doc.text(item_05_quantity, 116, 194.6);
-  // doc.text(item_05_price, 137, 194.6);
-  // doc.text(item_05_total_price, 168, 194.6);
+  doc.text(item_05, 30, 194.6);
+  doc.text(item_05_quantity, 116, 194.6);
+  doc.text(item_05_price, 137, 194.6);
+  doc.text(item_05_total_price, 168, 194.6);
 
-  // doc.text(item_06, 30, 208.2);
-  // doc.text(item_06_quantity, 116, 208.2);
-  // doc.text(item_06_price, 137, 208.2);
-  // doc.text(item_06_total_price, 168, 208.2);
+  doc.text(item_06, 30, 208.2);
+  doc.text(item_06_quantity, 116, 208.2);
+  doc.text(item_06_price, 137, 208.2);
+  doc.text(item_06_total_price, 168, 208.2);
 
-  doc.text((item?.totalPrice).toString(), 161, 225.5);
+  doc.text((`${item?.totalPrice}/-`).toString(), 161, 225.5);
   doc.text("Home", 182, 233.8);
-  doc.text("120.00/-", 161, 233.8);
-  doc.text((item?.discount).toString(), 161, 242.2);
-  doc.text(item?.customer_details?.salePrice.toString(), 161, 255.5);
+  doc.text((`${item?.deliveryCrg}/-`), 161, 233.8);
+  doc.text((`-${item?.discount}/-`).toString(), 161, 242.2);
+  doc.text((`${item?.customer_details?.salePrice.toString()}.00/-`), 161, 255.5);
   doc.save(item?.id);
+  doc.autoPrint();
+  //This is a key for printing
+  doc.output("dataurlnewwindow");
+};
+
+export   const generateStick = (item, config) => {
+
+  const doc = new jsPDF();
+  // const { inputRef } = useBarcode({
+  //   value: item?.id,
+  //   options: {
+  //     background: '#FFFFFF',
+  //     displayValue: false,
+  //     width: 3,
+  //     height: 80,
+  //   }
+  // });
+
+  // let image = document.getElementById("bar_code").getAttribute("src");
+
+  // doc.addImage(image, 30, 30, 140, 35);    
+
+  doc.setFontSize(22).text(`Created by SM.Devware.`, 105, 285);
+  doc.setFontSize(34);
+  doc.text(`Name: ${item?.customer_details.customer_name}`, 22, 100);
+  doc.text(`Phone: ${item?.customer_details.phone_number}`, 22, 112);
+
+  doc.text(`Hotline: +88 09649118888`, 30, 238);
+  doc.text(`Address: Nouhata, Paba, Rajshahi.`, 9, 250);
+
+  doc.text(`Address: `, 22, 124);
+  doc.setFontSize(28).text((item?.customer_details.customer_address), 72, 124, {maxWidth: 160, align: 'left'});
+  // doc.text(`Note: `, 22, 136);
+  // doc.setFontSize(28).text(`Some Note`, 54, 136);
+  doc.setFontSize(36).text(item?.id, 70, 74);
+  doc.setFont(undefined, 'bold');
+  doc.setFontSize(36).text("Rajshahir Aam Wala", 38, 225);
+  doc.setFontSize(40).text(`${item?.customer_details.delivery_type ? "HOME" : "POINT"} DELIVERY`, 40, 180);
+  doc.setFontSize(40).text(`COD: ${item?.customer_details.salePrice}/-`, 50, 195);
+  doc.setFontSize(36).text("Receiver:", 15, 88);
+  doc.setFontSize(36).text("Sender:", 15, 210);
+  doc.setFontSize(55).text("Rajshahir Aam Wala", 4, 25);
+  doc.setFontSize(36).text("Thanks for being with us.", 24, 270);
+
+  // doc.save(invoiceNo);
   doc.autoPrint();
   //This is a key for printing
   doc.output("dataurlnewwindow");
