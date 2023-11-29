@@ -1,8 +1,5 @@
-import React, {useEffect, useState} from "react";
-import { selectConfig } from "@/app/redux/slices/configSlice";
 import { jsPDF } from "jspdf";
-import { useBarcode } from 'next-barcode';
-import { useSelector } from "react-redux";
+
 
 // create random unique id
 export const uuid = () => {
@@ -202,10 +199,8 @@ export const invoiceGenerate = (item) => {
     item_06_price = "",
     item_06_total_price = "";
 
-
     item.order.map((e, i) => {
       i++;
-
       if (i === 1) {
         item_01 = e.title || "";
         item_01_quantity = `${e.quantity}`;
@@ -241,12 +236,10 @@ export const invoiceGenerate = (item) => {
 
   // doc.text(document.querySelector(".content > h2").innerHTML, 5, 75);
   doc.addImage("/invoice/invoice.jpg", 0, 0, 210, 297);
-  doc.text(item?.id, 43, 83.5);
   doc.text(item?.status, 91, 77);
   doc.text(item?.customer_details.customer_name, 33, 91.4);
   doc.text(item?.customer_details.phone_number, 33.3, 99);
-  doc.text(item?.customer_details.customer_address, 36.4, 106.5);
-
+  
   doc.text(item_01, 30, 139.6);
   doc.text(item_01_quantity, 116, 139.6);
   doc.text(item_01_price, 137, 139.6);
@@ -281,29 +274,28 @@ export const invoiceGenerate = (item) => {
   doc.text("Home", 182, 233.8);
   doc.text((`${item?.deliveryCrg}/-`), 161, 233.8);
   doc.text((`-${item?.discount}/-`).toString(), 161, 242.2);
-  doc.text((`${item?.customer_details?.salePrice.toString()}.00/-`), 161, 255.5);
+
+  doc.setFontSize(12).text(item?.customer_details.customer_address, 36.4, 106.5, {maxWidth: 165, align: 'left'});
+  doc.text(item?.date, 93, 83.5);
+  doc.setFont(undefined, 'bold');
+  doc.setFontSize(15).text(item?.id, 43, 83.5);
+  doc.setFontSize(18).text((`${item?.customer_details?.salePrice.toString()}.00/-`), 161, 255.5);
+  
   doc.save(item?.id);
   doc.autoPrint();
   //This is a key for printing
   doc.output("dataurlnewwindow");
 };
 
-export   const generateStick = (item, config) => {
+export   const generateStick = (item, barCodeImageLink) => {
 
   const doc = new jsPDF();
-  // const { inputRef } = useBarcode({
-  //   value: item?.id,
-  //   options: {
-  //     background: '#FFFFFF',
-  //     displayValue: false,
-  //     width: 3,
-  //     height: 80,
-  //   }
-  // });
 
-  // let image = document.getElementById("bar_code").getAttribute("src");
 
-  // doc.addImage(image, 30, 30, 140, 35);    
+  let image = `${barCodeImageLink}`;
+  // console.log(image)
+
+  doc.addImage(image, 30, 30, 140, 35);    
 
   doc.setFontSize(22).text(`Created by SM.Devware.`, 105, 285);
   doc.setFontSize(34);
@@ -314,17 +306,17 @@ export   const generateStick = (item, config) => {
   doc.text(`Address: Nouhata, Paba, Rajshahi.`, 9, 250);
 
   doc.text(`Address: `, 22, 124);
-  doc.setFontSize(28).text((item?.customer_details.customer_address), 72, 124, {maxWidth: 160, align: 'left'});
+  doc.setFontSize(26).text((item?.customer_details.customer_address), 72, 124, {maxWidth: 140, align: 'left'});
   // doc.text(`Note: `, 22, 136);
   // doc.setFontSize(28).text(`Some Note`, 54, 136);
   doc.setFontSize(36).text(item?.id, 70, 74);
   doc.setFont(undefined, 'bold');
   doc.setFontSize(36).text("Rajshahir Aam Wala", 38, 225);
-  doc.setFontSize(40).text(`${item?.customer_details.delivery_type ? "HOME" : "POINT"} DELIVERY`, 40, 180);
-  doc.setFontSize(40).text(`COD: ${item?.customer_details.salePrice}/-`, 50, 195);
+  doc.setFontSize(40).text(`${item?.customer_details.delivery_type ? "HOME" : "POINT"} DELIVERY`, 42, 180);
+  doc.setFontSize(40).text(`COD: ${item?.customer_details.salePrice}/-`, 65, 195);
   doc.setFontSize(36).text("Receiver:", 15, 88);
   doc.setFontSize(36).text("Sender:", 15, 210);
-  doc.setFontSize(55).text("Rajshahir Aam Wala", 4, 25);
+  doc.setFontSize(55).text("Rajshahir Aam Wala", 6, 25);
   doc.setFontSize(36).text("Thanks for being with us.", 24, 270);
 
   // doc.save(invoiceNo);

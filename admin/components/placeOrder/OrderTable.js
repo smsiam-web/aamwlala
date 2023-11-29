@@ -1,7 +1,6 @@
 import { Tooltip } from "@mantine/core";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { HiOutlineDocumentDownload } from "react-icons/hi";
-import { useState } from "react";
 import { Modal } from "@mantine/core";
 import { FiEdit } from "react-icons/fi";
 import { Group, Pagination } from "@mantine/core";
@@ -14,17 +13,12 @@ import FormHeader from "../shared/FormHeader";
 import Button from "../shared/Button";
 import NotFound from "../shared/NotFound";
 import { AiOutlinePrinter } from "react-icons/ai";
-import { useBarcode } from "next-barcode";
 import { selectUser } from "@/app/redux/slices/authSlice";
-import dynamic from "next/dynamic";
-
 import { generateStick, invoiceGenerate } from "@/admin/utils/helpers";
 import { FaPrint } from "react-icons/fa";
 import { selectConfig, updateConfig } from "@/app/redux/slices/configSlice";
-
-const GeneratePDF = dynamic(() => import("../../utils/GeneratePDF"), {
-  ssr: false,
-});
+import { useBarcode } from "next-barcode";
+import generateBarcodeImageLink from "../../utils/barcodeGenerator";
 
 const OrderTable = () => {
   const [loading, setLoading] = useState(false);
@@ -35,13 +29,26 @@ const OrderTable = () => {
   const [opened, setOpened] = useState(false);
   const order = useSelector(selectOrder);
   const user = useSelector(selectUser);
+  const [ID, setID] = useState(null);
+  const [barCodeImageLink, setBarCodeImageLink] = useState(null)
 
   const toggleOpen = () => {
-    opened ? setOpened(false) : setOpened(true)
-  }
+    opened ? setOpened(false) : setOpened(true);
+  };
+
+  console.log(ID)
 
   const ref = useRef();
 
+  const { inputRef } = useBarcode({
+    value: ID,
+      options: {
+      background: "#FFFFFF",
+      displayValue: false,
+      width: 3,
+      height: 80,
+    },
+  });
 
   useEffect(() => {
     setOrders(order);
@@ -50,13 +57,6 @@ const OrderTable = () => {
   const setPage = (i) => {
     setPagee(i);
   };
-  // const [config, setConfig] = useState();
-
-  // const data = useSelector(selectConfig);
-  
-  // useEffect(() => {
-  //   !!data && setConfig(data[0].values);
-  // }, []);
 
   // Change Status from status Action
   const onStatusChanged = async (e, id) => {
@@ -73,18 +73,20 @@ const OrderTable = () => {
     item.status === "Pending"
       ? updateStatus(item, "Processing", item?.id)
       : toggleOpen;
-        setFilterOrder(item);
+    setFilterOrder(item);
     //   console.log(item);
   };
   // Change Status from print Action and check print Status
   const stickerStatus = async (item) => {
-    item.status === "Processing" && generateStick(item);
-
+   await setID(item?.id);
     item.status === "Processing"
       ? updateStatus(item, "Shipped", item?.id)
       : toggleOpen;
-        setFilterOrder(item);
-    //   console.log(item);
+    setFilterOrder(item);
+    item.status === "Processing" && generateStick(item, inputRef?.current.src);
+
+
+    // setBarcodeImageLink(null)
   };
 
   // update status on firebase
@@ -136,9 +138,7 @@ const OrderTable = () => {
     const unSub = db.collection("config").onSnapshot((snap) => {
       const configData = [];
       snap.docs.map((doc) => {
-        configData.push(
-          doc.data()
-        )
+        configData.push(doc.data());
       });
       dispatch(updateConfig(configData));
     });
@@ -219,6 +219,9 @@ const OrderTable = () => {
         </div>
       </Modal>
       <div className="grid gap-4 w-full overflow-hidden ">
+        <div className="hidden">
+          <img ref={inputRef} alt="ok" />
+        </div>
         <div className="w-full overflow-x-scroll rounded-md relative">
           {/* order table  */}
           {!orders.length ? (
@@ -388,9 +391,11 @@ const OrderTable = () => {
 
                             <td className="px-4 py-3">
                               <div className="text-sm font-semibold flex justify-start gap-5 text-sub-title items-center">
-                              <Tooltip label="Sticker" color="blue" withArrow>
-                                  <span className="cursor-pointer hover:text-blue-400"
-                                  onClick={() => stickerStatus(item)} >
+                                <Tooltip label="Sticker" color="blue" withArrow>
+                                  <span
+                                    className="cursor-pointer hover:text-blue-400"
+                                    onClick={() => stickerStatus(item)}
+                                  >
                                     <FaPrint size={16} />
                                   </span>
                                 </Tooltip>
@@ -399,12 +404,11 @@ const OrderTable = () => {
                                   href={`/admin/orders/edit-order/id=${item.id}`}
                                 >
                                   <Tooltip label="Edit" color="blue" withArrow>
-                                  <span className="cursor-pointer hover:text-blue-400" >
-                                    <FiEdit size={16} />
-                                  </span>
-                                </Tooltip>
+                                    <span className="cursor-pointer hover:text-blue-400">
+                                      <FiEdit size={16} />
+                                    </span>
+                                  </Tooltip>
                                 </Link>
-                                
 
                                 <Tooltip label="Print" color="green" withArrow>
                                   <span

@@ -1255,6 +1255,11 @@ busboy@1.6.0:
   dependencies:
     streamsearch "^1.1.0"
 
+bwip-js@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.npmjs.org/bwip-js/-/bwip-js-4.1.2.tgz"
+  integrity sha512-/w+nIZ//91RQ7W6kHaHq6rDxix08xxp0QFl1hTn5KjW3Gj4NC5IbrNfS23yZx861DeT8YbQ/+vtbSq+5J8QuFA==
+
 call-bind@^1.0.0, call-bind@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/call-bind/-/call-bind-1.0.2.tgz"
@@ -3003,7 +3008,7 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
-jsbarcode@^3.11.3:
+jsbarcode@^3.11.3, jsbarcode@^3.8.0:
   version "3.11.5"
   resolved "https://registry.npmjs.org/jsbarcode/-/jsbarcode-3.11.5.tgz"
   integrity sha512-zv3KsH51zD00I/LrFzFSM6dst7rDn0vIMzaiZFL7qusTjPZiPtxg3zxetp0RR7obmjTw4f6NyGgbdkBCgZUIrA==
@@ -3621,6 +3626,14 @@ raf@^3.4.1:
   integrity sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==
   dependencies:
     performance-now "^2.1.0"
+
+react-barcode@^1.4.6:
+  version "1.4.6"
+  resolved "https://registry.npmjs.org/react-barcode/-/react-barcode-1.4.6.tgz"
+  integrity sha512-56WCPqjgpExPVi5LgKOfxM6uSCB4Wd1r94jY2VEwkIdigPjLp8P9RyIBIyQmDraxtYGOHE0e4Uer4+QrmOIy7Q==
+  dependencies:
+    jsbarcode "^3.8.0"
+    prop-types "^15.6.2"
 
 react-chartjs-2@^5.2.0:
   version "5.2.0"
