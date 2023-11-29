@@ -8,6 +8,7 @@ import Button from "./Button";
 import {TodayDate} from "../../utils/helpers"
 import { useSelector } from "react-redux";
 import { selectOrder } from "@/app/redux/slices/orderSlice";
+import { db } from "@/app/utils/firebase";
 
 
 const ExportCSV = ({item}) => {
@@ -18,9 +19,31 @@ const ExportCSV = ({item}) => {
   const DEFAULT_FILENAME = TodayDate();
 
 
-  useEffect(() => {
-   setOrder(ORDER)
-  }, [ORDER]);
+  // useEffect(() => {
+  //  setOrder(ORDER)
+  // }, [ORDER]);
+
+    // Get order from firebase database
+    useEffect(() => {
+      const unSub = db
+        .collection("placeOrder")
+        .orderBy("timestamp", "desc")
+        .limit(60)
+        .onSnapshot((snap) => {
+          const order = [];
+          snap.docs.map((doc) => {
+            order.push({
+              id: doc.id,
+              ...doc.data(),
+              // timestamp: doc.data().timestamp?.toDate().getTime(),
+            });
+          });
+          setOrder(order)
+        });
+      return () => {
+        unSub();
+      };
+    }, []);
 
   useEffect(() => {
     FilterOrder()
@@ -38,7 +61,7 @@ const ExportCSV = ({item}) => {
             Address: item.customer_details.customer_address,
             Phone: item.customer_details.phone_number,
             Amount: item.customer_details.salePrice,
-            Note: item.customer_details.delivery_type ? "Home Delivery" : "Point Delivery"
+            Note: `${item.customer_details.note}, ${item.customer_details.delivery_type ? "(Home Delivery)" : "(Point Delivery)"}`
         }
         SS.push(i);
     })
