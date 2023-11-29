@@ -131,21 +131,21 @@ const OrderTable = () => {
     };
   }, []);
 
-  // //get config
-  // useEffect(() => {
-  //   const unSub = db.collection("config").onSnapshot((snap) => {
-  //     const configData = [];
-  //     snap.docs.map((doc) => {
-  //       configData.push(
-  //         doc.data()
-  //       )
-  //     });
-  //     dispatch(updateConfig(configData));
-  //   });
-  //   return () => {
-  //     unSub();
-  //   };
-  // }, []);
+  //get config
+  useEffect(() => {
+    const unSub = db.collection("config").onSnapshot((snap) => {
+      const configData = [];
+      snap.docs.map((doc) => {
+        configData.push(
+          doc.data()
+        )
+      });
+      dispatch(updateConfig(configData));
+    });
+    return () => {
+      unSub();
+    };
+  }, []);
 
   //after confirmaiton Delete porduct from firebase
   const DeleteProduct = async (item) => {
