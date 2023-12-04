@@ -28,7 +28,7 @@ const ExportCSV = ({item}) => {
       const unSub = db
         .collection("placeOrder")
         .orderBy("timestamp", "desc")
-        .limit(60)
+        .limit(100)
         .onSnapshot((snap) => {
           const order = [];
           snap.docs.map((doc) => {

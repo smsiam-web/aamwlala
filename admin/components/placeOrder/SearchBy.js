@@ -56,6 +56,13 @@ const SearchBy = ({ onClick }) => {
     ss.length ? dispatch(updateOrder(ss)) : dispatch(updateOrder(orders));
   }, [currentValue]);
 
+
+  // useEffect(() => {
+  //   if((currentValue?.split("0")[0] === "RA") && (currentValue.length === 8)){
+  //     filter(currentValue)
+  //   }
+  // }, [currentValue]);
+
   // onStatus config
   const onStatusChanged = (e) => {
     e.preventDefault();
@@ -108,6 +115,18 @@ const SearchBy = ({ onClick }) => {
       ? dispatch(updateOrder(limits))
       : dispatch(updateOrder(orders));
   };
+
+
+  // const filter = async (id) => {
+  //   await db
+  //     .collection("placeOrder")
+  //     .doc(id)
+  //     .onSnapshot((snap) => {
+  //       const getOrder = [];
+  //       console.log(snap.docs)
+  //       setOrders(getOrder);
+  //     });
+  // };
 
   // // Get Order details from firebase and update on REDUX
   // useEffect(() => {
