@@ -36,8 +36,6 @@ const OrderTable = () => {
     opened ? setOpened(false) : setOpened(true);
   };
 
-  console.log(ID)
-
   const ref = useRef();
 
   const { inputRef } = useBarcode({
