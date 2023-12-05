@@ -33,10 +33,43 @@ const validationSchema = Yup.object().shape({
 const AddOrder = ({ onClick }) => {
   const [config, setConfig] = useState(useSelector(selectConfig) || null);
   const [loading, setLoading] = useState(false);
+  const [orderResponse, setOrderResponse] = useState(false);
   const user = useSelector(selectUser);
   const router = useRouter();
   const [products, setProducts] = useState(null);
   const [uid, setInvoiceID] = useState(null);
+
+  // // Function to place an order
+  // const placeOrderStf = async (orderData) => {
+  //   try {
+  //     // Set your API key and secret key
+  //     const apiKey = config[0]?.values.sfc_api_key;
+  //     const secretKey = config[0]?.values.sfc_secret_key;
+
+  //     // Prepare headers for the request
+  //     const headers = new Headers();
+  //     headers.append("Api-Key", apiKey);
+  //     headers.append("Secret-Key", secretKey);
+  //     headers.append("Content-Type", "application/json");
+
+  //     // Make the POST request
+  //     const response = await fetch('https://portal.steadfast.com.bd/api/v1/create_order', {
+  //       method: 'POST',
+  //       headers: headers,
+  //       body: JSON.stringify(orderData),
+  //     });
+
+  //     // Handle the response
+  //     const data = await response.json();
+  //     return(data);
+
+  //     // You can update the state or perform other actions based on the response
+  //     // For example, if using React with state:
+  //     // setOrderResponse(data);
+  //   } catch (error) {
+  //     console.error("Error placing order:", error);
+  //   }
+  // };
 
   // Get products from firebase database
   useEffect(() => {
@@ -51,8 +84,6 @@ const AddOrder = ({ onClick }) => {
     };
   }, []);
 
-  console.log(uid?.invoice_id);
-
   // Get products from firebase database
   useEffect(() => {
     const unSub = db
@@ -62,9 +93,9 @@ const AddOrder = ({ onClick }) => {
         const product = [];
         snap.docs.map((doc) => {
           // doc.data().product_details.parent_category === "খেজুরের গুড়" &&
-            product.push({
-              ...doc.data().product_details,
-            });
+          product.push({
+            ...doc.data().product_details,
+          });
         });
         setProducts(product);
       });
@@ -115,7 +146,7 @@ const AddOrder = ({ onClick }) => {
         totalPrice += p.total_price;
       });
 
-      console.log(order)
+    console.log(order);
 
     const deliveryCrg =
       weight >= 1 && weight === 1 ? 130 : 130 + (weight - 1) * 20;
@@ -126,31 +157,92 @@ const AddOrder = ({ onClick }) => {
 
     const date = Today();
 
-    await placeOrderHandler(
-      deliveryCrg,
-      weight,
-      values,
-      discount,
-      totalPrice,
-      date,
-      order,
-      invoice_str,
-      timestamp
-    );
+    try {
+      // Set your API key and secret key
+      const apiKey = config[0]?.values.sfc_api_key;
+      const secretKey = config[0]?.values.sfc_secret_key;
+
+      // Prepare headers for the request
+      const headers = new Headers();
+      headers.append("Api-Key", apiKey);
+      headers.append("Secret-Key", secretKey);
+      headers.append("Content-Type", "application/json");
+
+      const orderData = {
+        cod_amount: `${values.salePrice}`,
+        invoice: `${invoice_str}`,
+        note: `${values.note}`,
+        recipient_address: `${values.customer_address}`,
+        recipient_name: `${values.customer_name}`,
+        recipient_phone: `${values.phone_number}`,
+      };
+
+      // Make the POST request
+      const response = await fetch(
+        "https://portal.steadfast.com.bd/api/v1/create_order",
+        {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(orderData),
+        }
+      );
+
+      // Handle the response
+      const data = await response.json();
+      console.log(data);
+      await placeOrderHandler(
+        data,
+        deliveryCrg,
+        weight,
+        values,
+        discount,
+        totalPrice,
+        date,
+        order,
+        invoice_str,
+        timestamp
+      );
+      await sendConfirmationMsg(
+        values,
+        invoice_str,
+        data?.consignment.tracking_code,
+      );
+
+      // You can update the state or perform other actions based on the response
+      // For example, if using React with state:
+      setOrderResponse(data);
+    } catch (error) {
+      console.error("Error placing order:", error);
+    }
     await createCustomer(values, date, cusetomer_id, timestamp);
+
+    // orderResponse.status === 200 && placeOrderHandler(
+    //   data,
+    //   deliveryCrg,
+    //   weight,
+    //   values,
+    //   discount,
+    //   totalPrice,
+    //   date,
+    //   order,
+    //   invoice_str,
+    //   timestamp
+    // );
+    // sendConfirmationMsg(values, invoice_str, config);
+
     router.push("/admin/place-order/id=" + invoice_str);
-    sendConfirmationMsg(values, invoice_str, config);
     setLoading(false);
+    setOrderResponse(null);
   };
 
-  const sendConfirmationMsg = async (values, invoice_str) => {
+  const sendConfirmationMsg = async (values, invoice_str, tracking_code) => {
     const customer_name = values?.customer_name || "Customer";
     const company_name = config[0]?.values.company_name;
     const company_contact = config[0]?.values.company_contact;
 
     const url = "https://api.sms.net.bd/sendsms";
     const apiKey = config[0]?.values.bulk_auth;
-    const message = `Dear ${customer_name}, Your order has been successfully placed at ${company_name}. Invoice No: ${invoice_str}. Please keep BDT: ${values?.salePrice}tk ready while receiving the parcel. Hotline: +88${company_contact}. Thanks for being with us.`;
+    const message = `Dear ${customer_name}, Your order has been successfully placed at ${company_name}. Invoice No: ${invoice_str}. Please keep BDT: ${values?.salePrice}tk ready while receiving the parcel. Track your Parcel here: https://steadfast.com.bd/t/${tracking_code} Hotline: +88${company_contact}. Thanks for being with us.`;
     const to = values?.phone_number;
 
     const formData = new FormData();
@@ -181,6 +273,7 @@ const AddOrder = ({ onClick }) => {
 
   // save order details on firebase database
   const placeOrderHandler = async (
+    data,
     deliveryCrg,
     weight,
     values,
@@ -192,6 +285,8 @@ const AddOrder = ({ onClick }) => {
     timestamp
   ) => {
     await db.collection("placeOrder").doc(invoice_str).set({
+      consignment_id: data?.consignment.consignment_id,
+      tracking_code: data?.consignment.tracking_code,
       deliveryCrg,
       weight,
       customer_details: values,

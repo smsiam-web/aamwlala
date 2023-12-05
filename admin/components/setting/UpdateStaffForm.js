@@ -48,6 +48,14 @@ const UpdateStaffForm = () => {
         <span className="lable">Bulk Auth Key</span>
         <FormInput name="bulk_auth" type="password" placeholder="Auth key" items={null} />
       </div>    
+      <div>
+        <span className="lable">SFC API Key</span>
+        <FormInput name="sfc_api_key" type="password" placeholder="SFC API key" items={null} />
+      </div>    
+      <div>
+        <span className="lable">SFC Secret Key</span>
+        <FormInput name="sfc_secret_key" type="password" placeholder="SFC Secret key" items={null} />
+      </div>    
     </>
   );
 };

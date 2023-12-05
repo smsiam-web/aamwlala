@@ -208,7 +208,6 @@ const SearchBy = ({ onClick }) => {
         }
       });
   };
-  console.log(filterOrder, currentValue);
 
   return (
     <>

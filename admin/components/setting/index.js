@@ -17,6 +17,8 @@ const validationSchema = Yup.object().shape({
   address: Yup.string().required().max(25).label("address max 25 Char."),
   company_contact: Yup.string().required().label("Phone number"),
   bulk_auth: Yup.string().label("Staff role"),
+  sfc_api_key: Yup.string().label("Staff role"),
+  sfc_secret_key: Yup.string().label("Staff role"),
 });
 
 const Setting = () => {
@@ -65,6 +67,8 @@ const Setting = () => {
                 address: !!config && config[0]?.values.address || "",
                 company_contact: !!config && config[0]?.values.company_contact || "",
                 bulk_auth: !!config && config[0]?.values.bulk_auth || "",
+                sfc_api_key: !!config && config[0]?.values.sfc_api_key || "",
+                sfc_secret_key: !!config && config[0]?.values.sfc_secret_key || "",
               }}
               onSubmit={placeConfig}
               validationSchema={validationSchema}
