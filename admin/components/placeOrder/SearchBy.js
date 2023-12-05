@@ -3,7 +3,6 @@ import Button from "@/app/components/shared/Button";
 import { AiOutlineAppstoreAdd, AiOutlinePrinter } from "react-icons/ai";
 import { db } from "@/app/utils/firebase";
 import { useDispatch, useSelector } from "react-redux";
-import { selectOrder, updateOrder } from "@/app/redux/slices/orderSlice";
 import {
   ToDateAndTime,
   daysInMonth,
@@ -18,12 +17,14 @@ import { Modal, Tooltip } from "@mantine/core";
 import { FaPrint } from "react-icons/fa";
 import { useBarcode } from "next-barcode";
 import { notifications } from "@mantine/notifications";
+import { selectUser } from "@/app/redux/slices/authSlice";
 
 const SearchBy = ({ onClick }) => {
   const [currentValue, setCurrentValue] = useState("RA01");
   const [filterOrder, setFilterOrder] = useState(null);
   const [openedd, setOpened] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -298,7 +299,7 @@ const SearchBy = ({ onClick }) => {
               </div>
             </div>
             <div className="flex gap-4 justify-end">
-              {filterOrder.status === "Processing" && (
+              {user.staff_role === "HR" && filterOrder.status === "Processing" && (
                 <Tooltip label="Sticker" color="green" withArrow>
                   <span
                     title="Sticker"
@@ -309,7 +310,7 @@ const SearchBy = ({ onClick }) => {
                   </span>
                 </Tooltip>
               )}
-              {filterOrder.status === "Pending" && (
+              {(user.staff_role === "HR" || user.staff_role === "Admin") && filterOrder.status === "Pending" && (
                 <Tooltip label="Invoice" color="blue" withArrow>
                   <span
                     title="Invoice"

@@ -29,7 +29,7 @@ const OrderTable = () => {
   const order = useSelector(selectOrder);
   const user = useSelector(selectUser);
   const [ID, setID] = useState(null);
-  const [barCodeImageLink, setBarCodeImageLink] = useState(null)
+  const [barCodeImageLink, setBarCodeImageLink] = useState(null);
 
   const toggleOpen = () => {
     opened ? setOpened(false) : setOpened(true);
@@ -39,7 +39,7 @@ const OrderTable = () => {
 
   const { inputRef } = useBarcode({
     value: ID,
-      options: {
+    options: {
       background: "#FFFFFF",
       displayValue: false,
       width: 3,
@@ -75,7 +75,7 @@ const OrderTable = () => {
   };
   // Change Status from print Action and check print Status
   const stickerStatus = async (item) => {
-   await setID(item?.id);
+    await setID(item?.id);
     item.status === "Processing"
       ? updateStatus(item, "Shipped", item?.id)
       : toggleOpen;
@@ -243,10 +243,10 @@ const OrderTable = () => {
                   <th className="px-4 py-3 ">Created at</th>
                   <th className="px-4 py-3 ">Created By</th>
                   <th className="px-4 py-3 ">invoice</th>
-                  {
-                   (user.staff_role === "HR" || user.staff_role === "Admin") && <th className="px-4 py-3 ">ACTIONS</th>
-                  }
-                  
+                  {(user.staff_role === "HR" ||
+                    user.staff_role === "Admin") && (
+                    <th className="px-4 py-3 ">ACTIONS</th>
+                  )}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100 ">
@@ -386,43 +386,54 @@ const OrderTable = () => {
                               </Link>
                             </td>
 
-                            {
-                              (user.staff_role === "HR" || user.staff_role === "Admin") && 
-                                <td className="px-4 py-3">
-                              <div className="text-sm font-semibold flex justify-start gap-5 text-sub-title items-center">
-                                <Tooltip label="Sticker" color="blue" withArrow>
-                                  <span
-                                    className="cursor-pointer hover:text-blue-400"
-                                    onClick={() => stickerStatus(item)}
-                                  >
-                                    <FaPrint size={16} />
-                                  </span>
-                                </Tooltip>
+                            {(user.staff_role === "HR" ||
+                              user.staff_role === "Admin") && (
+                              <td className="px-4 py-3">
+                                <div className="text-sm font-semibold flex justify-start gap-5 text-sub-title items-center">
+                                  {user.staff_role === "HR" && (
+                                    <Tooltip
+                                      label="Sticker"
+                                      color="blue"
+                                      withArrow
+                                    >
+                                      <span
+                                        className="cursor-pointer hover:text-blue-400"
+                                        onClick={() => stickerStatus(item)}
+                                      >
+                                        <FaPrint size={16} />
+                                      </span>
+                                    </Tooltip>
+                                  )}
 
-                                <Link
-                                  href={`/admin/orders/edit-order/id=${item.id}`}
-                                >
-                                  <Tooltip label="Edit" color="blue" withArrow>
-                                    <span className="cursor-pointer hover:text-blue-400">
-                                      <FiEdit size={16} />
+                                  <Link
+                                    href={`/admin/orders/edit-order/id=${item.id}`}
+                                  >
+                                    <Tooltip
+                                      label="Edit"
+                                      color="blue"
+                                      withArrow
+                                    >
+                                      <span className="cursor-pointer hover:text-blue-400">
+                                        <FiEdit size={16} />
+                                      </span>
+                                    </Tooltip>
+                                  </Link>
+
+                                  <Tooltip
+                                    label="Print"
+                                    color="green"
+                                    withArrow
+                                  >
+                                    <span
+                                      className="cursor-pointer hover:text-blue-400"
+                                      onClick={() => statusUpdate(item)}
+                                    >
+                                      <AiOutlinePrinter size={20} />
                                     </span>
                                   </Tooltip>
-                                </Link>
-
-                                <Tooltip label="Print" color="green" withArrow>
-                                  <span
-                                    className="cursor-pointer hover:text-blue-400"
-                                    onClick={() => statusUpdate(item)}
-                                  >
-                                    <AiOutlinePrinter size={20} />
-                                  </span>
-                                </Tooltip>
-                              </div>
-                            </td>
-                              
-                            }
-
-                            
+                                </div>
+                              </td>
+                            )}
                           </tr>
                         )
                     )}
