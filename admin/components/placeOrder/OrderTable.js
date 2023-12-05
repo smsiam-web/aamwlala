@@ -233,7 +233,7 @@ const OrderTable = () => {
                   <th className="px-4 py-3 ">status</th>
                   <th
                     className={`px-4 py-3 ${
-                      user.staff_role === "HR" || user.staff_role == "Admin"
+                      user.staff_role === "HR" || user.staff_role === "Admin"
                         ? ""
                         : "hidden"
                     }`}
@@ -243,7 +243,10 @@ const OrderTable = () => {
                   <th className="px-4 py-3 ">Created at</th>
                   <th className="px-4 py-3 ">Created By</th>
                   <th className="px-4 py-3 ">invoice</th>
-                  <th className="px-4 py-3 ">ACTIONS</th>
+                  {
+                   (user.staff_role === "HR" || user.staff_role === "Admin") && <th className="px-4 py-3 ">ACTIONS</th>
+                  }
+                  
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100 ">
@@ -383,7 +386,9 @@ const OrderTable = () => {
                               </Link>
                             </td>
 
-                            <td className="px-4 py-3">
+                            {
+                              (user.staff_role === "HR" || user.staff_role === "Admin") && 
+                                <td className="px-4 py-3">
                               <div className="text-sm font-semibold flex justify-start gap-5 text-sub-title items-center">
                                 <Tooltip label="Sticker" color="blue" withArrow>
                                   <span
@@ -414,6 +419,10 @@ const OrderTable = () => {
                                 </Tooltip>
                               </div>
                             </td>
+                              
+                            }
+
+                            
                           </tr>
                         )
                     )}
