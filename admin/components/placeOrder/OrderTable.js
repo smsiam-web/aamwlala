@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { HiOutlineDocumentDownload } from "react-icons/hi";
 import { Modal } from "@mantine/core";
 import { FiEdit } from "react-icons/fi";
-import { Group, Pagination } from "@mantine/core";
+import { Pagination } from "@mantine/core";
 import Link from "next/link";
 import { db } from "@/app/utils/firebase";
 import { notifications } from "@mantine/notifications";
@@ -16,9 +16,8 @@ import { AiOutlinePrinter } from "react-icons/ai";
 import { selectUser } from "@/app/redux/slices/authSlice";
 import { generateStick, invoiceGenerate } from "@/admin/utils/helpers";
 import { FaPrint } from "react-icons/fa";
-import { selectConfig, updateConfig } from "@/app/redux/slices/configSlice";
+import { updateConfig } from "@/app/redux/slices/configSlice";
 import { useBarcode } from "next-barcode";
-import generateBarcodeImageLink from "../../utils/barcodeGenerator";
 
 const OrderTable = () => {
   const [loading, setLoading] = useState(false);
@@ -82,9 +81,6 @@ const OrderTable = () => {
       : toggleOpen;
     setFilterOrder(item);
     item.status === "Processing" && generateStick(item, inputRef?.current.src);
-
-
-    // setBarcodeImageLink(null)
   };
 
   // update status on firebase

@@ -12,6 +12,7 @@ import staffReducer from "./slices/staffSlice";
 import configReducer from "./slices/configSlice";
 import tempImgReducer from "./slices/tempImgUrl";
 import categoryReducer from "./slices/categorySlice";
+import singleOrderReducer from "./slices/singleOrderSlice";
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ export const store = configureStore({
     singleProduct,
     tempImgUrl: tempImgReducer,
     category: categoryReducer,
+    singleOrder: singleOrderReducer,
   },
 
   middleware: (curryGetDefaultMiddleware) =>
