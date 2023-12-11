@@ -38,6 +38,7 @@ const AddOrder = ({ onClick }) => {
   const router = useRouter();
   const [products, setProducts] = useState(null);
   const [uid, setInvoiceID] = useState(null);
+  const [isFalse, setFalse] = useState(false);
 
   // // Function to place an order
   // const placeOrderStf = async (orderData) => {
@@ -146,8 +147,6 @@ const AddOrder = ({ onClick }) => {
         totalPrice += p.total_price;
       });
 
-    console.log(order);
-
     const deliveryCrg =
       weight >= 1 && weight === 1 ? 130 : 130 + (weight - 1) * 20;
     const discount =
@@ -210,39 +209,48 @@ const AddOrder = ({ onClick }) => {
 
       // You can update the state or perform other actions based on the response
       // For example, if using React with state:
-      setOrderResponse(data);
     } catch (error) {
+
+     await isFailedPlaceOrderHandler(
+        deliveryCrg,
+        weight,
+        values,
+        discount,
+        totalPrice,
+        date,
+        order,
+        invoice_str,
+        timestamp
+      );
+      await sendConfirmationMsg(values, invoice_str);
+
       console.error("Error placing order:", error);
     }
-    await createCustomer(values, date, cusetomer_id, timestamp);
 
-    // orderResponse.status === 200 && placeOrderHandler(
-    //   data,
-    //   deliveryCrg,
-    //   weight,
-    //   values,
-    //   discount,
-    //   totalPrice,
-    //   date,
-    //   order,
-    //   invoice_str,
-    //   timestamp
-    // );
-    // sendConfirmationMsg(values, invoice_str, config);
+    await createCustomer(values, date, cusetomer_id, timestamp);
 
     router.push("/admin/place-order/id=" + invoice_str);
     setLoading(false);
     setOrderResponse(null);
   };
 
-  const sendConfirmationMsg = async (values, invoice_str, tracking_code) => {
+  const sendConfirmationMsg = async (
+    values,
+    invoice_str,
+    tracking_code = ""
+  ) => {
     const customer_name = values?.customer_name || "Customer";
     const company_name = config[0]?.values.company_name;
     const company_contact = config[0]?.values.company_contact;
 
     const url = "https://api.sms.net.bd/sendsms";
     const apiKey = config[0]?.values.bulk_auth;
-    const message = `Dear ${customer_name}, Your order has been successfully placed at ${company_name}. Invoice No: ${invoice_str}. Please keep BDT: ${values?.salePrice}tk ready while receiving the parcel. Track your Parcel here: https://steadfast.com.bd/t/${tracking_code} Hotline: +88${company_contact}. Thanks for being with us.`;
+    const message = `Dear ${customer_name}, Your order has been successfully placed at ${company_name}. Invoice No: ${invoice_str}. Please keep BDT: ${
+      values?.salePrice
+    }tk ready while receiving the parcel.${
+      tracking_code &&
+      ` Track your Parcel here: https://steadfast.com.bd/t/${tracking_code}`
+    } Hotline: +88${company_contact}. Thanks for being with us.`;
     const to = values?.phone_number;
 
     const formData = new FormData();
@@ -287,6 +295,32 @@ const AddOrder = ({ onClick }) => {
     await db.collection("placeOrder").doc(invoice_str).set({
       consignment_id: data?.consignment.consignment_id,
       tracking_code: data?.consignment.tracking_code,
+      deliveryCrg,
+      weight,
+      customer_details: values,
+      discount,
+      totalPrice,
+      date,
+      order,
+      timestamp,
+      placeBy: user.name,
+      placeById: user.staff_id,
+      status: "Pending",
+    });
+  };
+
+  const isFailedPlaceOrderHandler = async (
+    deliveryCrg,
+    weight,
+    values,
+    discount,
+    totalPrice,
+    date,
+    order,
+    invoice_str,
+    timestamp
+  ) => {
+    await db.collection("placeOrder").doc(invoice_str).set({
       deliveryCrg,
       weight,
       customer_details: values,
