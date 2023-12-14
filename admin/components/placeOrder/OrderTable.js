@@ -334,6 +334,9 @@ const OrderTable = () => {
                                     item.status.toLowerCase() === "delivered" &&
                                     "text-green-500 bg-green-100"
                                   } ${
+                                    item.status.toLowerCase() === "returned" &&
+                                    "bg-teal-100 text-teal-500"
+                                  } ${
                                     item.status.toLowerCase() === "cancelled" &&
                                     "bg-red-100 text-red-500"
                                   } inline-flex px-2 text-xs capitalize font-medium leading-5 rounded-full`}
@@ -367,6 +370,7 @@ const OrderTable = () => {
                                 <option value="Shipped">Shipped</option>
                                 <option value="Delivered">Delivered</option>
                                 <option value="Hold">Hold</option>
+                                <option value="Returned">Returned</option>
                                 <option value="Cancelled">Cancelled</option>
                               </select>
                             </td>
