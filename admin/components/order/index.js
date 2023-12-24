@@ -13,6 +13,7 @@ const dispatch = useDispatch();
       const unSub = db
         .collection("placeOrder")
         .orderBy("timestamp", "desc")
+        .limit(500)
         .onSnapshot((snap) => {
           const order = [];
           snap.docs.map((doc) => {

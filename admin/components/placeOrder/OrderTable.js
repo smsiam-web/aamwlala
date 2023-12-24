@@ -109,7 +109,7 @@ const OrderTable = () => {
     const unSub = db
       .collection("placeOrder")
       .orderBy("timestamp", "desc")
-      .limit(10)
+      .limit(30)
       .onSnapshot((snap) => {
         const order = [];
         snap.docs.map((doc) => {
