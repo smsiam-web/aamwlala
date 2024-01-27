@@ -20,7 +20,7 @@ import { notifications } from "@mantine/notifications";
 import { selectUser } from "@/app/redux/slices/authSlice";
 
 const SearchBy = ({ onClick }) => {
-  const [currentValue, setCurrentValue] = useState("RA01");
+  const [currentValue, setCurrentValue] = useState("RA0");
   const [filterOrder, setFilterOrder] = useState(null);
   const [openedd, setOpened] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
