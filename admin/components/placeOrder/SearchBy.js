@@ -20,7 +20,7 @@ import { notifications } from "@mantine/notifications";
 import { selectUser } from "@/app/redux/slices/authSlice";
 
 const SearchBy = ({ onClick }) => {
-  const [currentValue, setCurrentValue] = useState("RA0");
+  const [currentValue, setCurrentValue] = useState("RA02");
   const [filterOrder, setFilterOrder] = useState(null);
   const [openedd, setOpened] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
@@ -29,7 +29,7 @@ const SearchBy = ({ onClick }) => {
 
   useEffect(() => {
    if(!!opened) return;
-    setCurrentValue("RA01");
+    setCurrentValue("RA02");
     setFilterOrder(null);
   }, [opened]);
 
@@ -320,11 +320,6 @@ const SearchBy = ({ onClick }) => {
                   </span>
                 </Tooltip>
               )}
-
-              {/* <Button
-                title="Invoice"
-                className="bg-blue-400 text-white font-medium"
-              /> */}
             </div>
           </div>
         )}
