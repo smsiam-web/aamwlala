@@ -35,6 +35,7 @@ const ExportCSV = () => {
                 Address: doc?.data()?.customer_details.customer_address,
                 Phone: doc?.data()?.customer_details.phone_number,
                 Amount: doc?.data()?.customer_details.salePrice,
+                Weight: doc?.data()?.weight,
                 Note: `${doc?.data()?.customer_details.note} ${
                   doc?.data()?.customer_details.delivery_type
                     ? "(Home Delivery)"
