@@ -51,7 +51,7 @@ const OrderDetails = ({ onClick, item }) => {
         <img id="bar_code" ref={inputRef} className="hidden" />
         <img
           id="image"
-          src="/invoice/invoice.jpg"
+          src="/invoice/invoice.png"
           width="300"
           height="200"
           className="hidden"
