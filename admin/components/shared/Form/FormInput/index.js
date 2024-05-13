@@ -42,13 +42,15 @@ function FormInput({
   }, [id]);
 
   console.log(item);
+  console.log(values);
 
   useEffect(() => {
     setValues({
       ...values,
-      customer_name: customer?.cus_name,
-      customer_address: customer?.cus_address,
+      customer_name: customer?.cus_name || "",
+      customer_address: customer?.cus_address || "",
     });
+
     setLoading(false);
   }, [customer]);
 

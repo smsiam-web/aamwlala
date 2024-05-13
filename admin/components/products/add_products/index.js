@@ -47,6 +47,8 @@ const AddProduts = ({ onClick }) => {
   const placeProduct = async (values) => {
     setLoading(true);
 
+    console.log(values);
+
     // offer calC
     const price = parseInt(values.price);
     const sale_price = parseInt(values.sale_price);
@@ -63,6 +65,14 @@ const AddProduts = ({ onClick }) => {
 
   // save order details on firebase database
   const placeProductHandler = async (values, product_id, off_price) => {
+    console.log({
+      productImg,
+      product_details: values,
+      isPublished: false,
+      weight: 12,
+      off_price,
+      timestamp,
+    });
     await db.collection("products").doc(product_id).set({
       productImg,
       product_details: values,
