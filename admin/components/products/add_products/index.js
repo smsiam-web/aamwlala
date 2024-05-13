@@ -14,6 +14,7 @@ import { selectUpdateProductId } from "@/app/redux/slices/updateProductId";
 const validationSchema = Yup.object().shape({
   sku: Yup.string().label("Product SKU"),
   product_name: Yup.string().max(200).required().label("Product Title"),
+  yup: Yup.string().max(200).required().label("Memo Name"),
   slug: Yup.string().required().label("২০০-৩০০"),
   product_description: Yup.string()
     .max(500)
@@ -79,6 +80,7 @@ const AddProduts = ({ onClick }) => {
           initialValues={{
             sku: product_details?.sku || "",
             product_name: product_details?.product_name || "",
+            yup: product_details?.yup || "",
             slug: product_details?.slug || "",
             product_description: product_details?.product_description || "",
             parent_category: product_details?.parent_category || "",

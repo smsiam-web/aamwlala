@@ -9,7 +9,7 @@ import {
   selectUpdateProductId,
   updateProductId,
 } from "@/app/redux/slices/updateProductId";
-
+import { updateSingleCustomer } from "@/app/redux/slices/singleCustomerSlice";
 
 //get hard coded program object
 // import { program } from "./programObject";
@@ -28,13 +28,13 @@ const PlaceOrder = () => {
 
   // toggle drawer
   const toggleOpen = () => {
+    dispatch(updateSingleCustomer([]));
     opened ? cleanId() : setOpend(true);
   };
 
   useEffect(() => {
     ID && toggleOpen();
   }, [ID]);
-
 
   return (
     <main className="h-full overflow-y-auto">

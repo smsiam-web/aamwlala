@@ -13,6 +13,8 @@ import configReducer from "./slices/configSlice";
 import tempImgReducer from "./slices/tempImgUrl";
 import categoryReducer from "./slices/categorySlice";
 import singleOrderReducer from "./slices/singleOrderSlice";
+import singleCustomerReducer from "./slices/singleCustomerSlice";
+import productValueReducer from "./slices/productValueSlice";
 
 export const store = configureStore({
   reducer: {
@@ -30,11 +32,12 @@ export const store = configureStore({
     tempImgUrl: tempImgReducer,
     category: categoryReducer,
     singleOrder: singleOrderReducer,
+    singleCustomer: singleCustomerReducer,
+    productValue: productValueReducer,
   },
 
   middleware: (curryGetDefaultMiddleware) =>
-     curryGetDefaultMiddleware({
+    curryGetDefaultMiddleware({
       serializableCheck: false,
-     })
-
+    }),
 });

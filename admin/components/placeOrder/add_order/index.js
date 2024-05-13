@@ -11,6 +11,8 @@ import { selectUser } from "@/app/redux/slices/authSlice";
 import { Today } from "@/admin/utils/helpers";
 import { selectConfig } from "@/app/redux/slices/configSlice";
 import axios from "axios";
+import { selectSingleCustomer } from "@/app/redux/slices/singleCustomerSlice";
+import { Formik } from "formik";
 
 const validationSchema = Yup.object().shape({
   delivery_type: Yup.boolean().required().label("Delivery type"),
@@ -22,12 +24,6 @@ const validationSchema = Yup.object().shape({
   customer_address: Yup.string().max(300).required().label("Address"),
   salePrice: Yup.number().required().label("Sale Price"),
   note: Yup.string().max(500).label("Note"),
-  patali_gol: Yup.number().positive().label("Weight"),
-  patali_pata: Yup.number().positive().label("Weight"),
-  patali_foial: Yup.number().positive().label("Weight"),
-  patali_narkel: Yup.number().positive().label("Weight"),
-  liquid: Yup.number().positive().label("Weight"),
-  dana: Yup.number().positive().label("Weight"),
 });
 
 const AddOrder = ({ onClick }) => {
@@ -38,7 +34,10 @@ const AddOrder = ({ onClick }) => {
   const router = useRouter();
   const [products, setProducts] = useState(null);
   const [uid, setInvoiceID] = useState(null);
-  const [isFalse, setFalse] = useState(false);
+  const [customer, setCustomer] = useState(null);
+
+  const getCustomer = useSelector(selectSingleCustomer);
+  console.log(customer);
 
   // // Function to place an order
   // const placeOrderStf = async (orderData) => {
@@ -84,6 +83,10 @@ const AddOrder = ({ onClick }) => {
       unSub();
     };
   }, []);
+
+  useEffect(() => {
+    setCustomer(getCustomer);
+  }, [getCustomer]);
 
   // Get products from firebase database
   useEffect(() => {
@@ -204,14 +207,13 @@ const AddOrder = ({ onClick }) => {
       await sendConfirmationMsg(
         values,
         invoice_str,
-        data?.consignment.tracking_code,
+        data?.consignment.tracking_code
       );
 
       // You can update the state or perform other actions based on the response
       // For example, if using React with state:
     } catch (error) {
-
-     await isFailedPlaceOrderHandler(
+      await isFailedPlaceOrderHandler(
         deliveryCrg,
         weight,
         values,
@@ -353,12 +355,6 @@ const AddOrder = ({ onClick }) => {
             customer_address: "",
             salePrice: "",
             note: "",
-            patali_gol: "",
-            patali_pata: "",
-            patali_foial: "",
-            patali_narkel: "",
-            liquid: "",
-            dana: "",
           }}
           onSubmit={placeOrder}
           validationSchema={validationSchema}

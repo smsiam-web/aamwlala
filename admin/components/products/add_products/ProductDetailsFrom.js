@@ -21,6 +21,10 @@ const ProductDetailsFrom = () => {
         <FormInput name="product_name" placeholder="Product title" />
       </div>
       <div>
+        <span>Memo Title/Name* Must be English</span>
+        <FormInput name="yup" placeholder="Memo title" />
+      </div>
+      <div>
         <span>Product Slug</span>
         <FormInput name="slug" placeholder="(২০০-৩০০) গ্রাম" />
       </div>

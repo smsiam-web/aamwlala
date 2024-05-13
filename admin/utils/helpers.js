@@ -1,6 +1,5 @@
 import { jsPDF } from "jspdf";
 
-
 // create random unique id
 export const uuid = () => {
   return "xxxxxxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -199,47 +198,47 @@ export const invoiceGenerate = (item) => {
     item_06_price = "",
     item_06_total_price = "";
 
-    item.order.map((e, i) => {
-      i++;
-      if (i === 1) {
-        item_01 = e.title || "";
-        item_01_quantity = `${e.quantity}`;
-        item_01_price = [e.price];
-        item_01_total_price = `${e.total_price}/-`;
-      } else if (i === 2) {
-        item_02 = e.title || "";
-        item_02_quantity = `${e.quantity}`;
-        item_02_price = [e.price];
-        item_02_total_price = `${e.total_price}/-`;
-      } else if (i === 3) {
-        item_03 = e.title || "";
-        item_03_quantity = `${e.quantity}`;
-        item_03_price = [e.price];
-        item_03_total_price = `${e.total_price}/-`;
-      } else if (i === 4) {
-        item_04 = e.title || "";
-        item_04_quantity = `${e.quantity}`;
-        item_04_price = [e.price];
-        item_04_total_price = `${e.total_price}/-`;
-      } else if (i === 5) {
-        item_05 = e.title || "";
-        item_05_quantity = `${e.quantity}`;
-        item_05_price = [e.price];
-        item_05_total_price = `${e.total_price}/-`;
-      } else if (i === 6) {
-        item_06 = e.title || "";
-        item_06_quantity = `${e.quantity}`;
-        item_06_price = [e.price];
-        item_06_total_price = `${e.total_price}/-`;
-      }
-    })
+  item.order.map((e, i) => {
+    i++;
+    if (i === 1) {
+      item_01 = e.title || "";
+      item_01_quantity = `${e.quantity}`;
+      item_01_price = [e.price];
+      item_01_total_price = `${e.total_price}/-`;
+    } else if (i === 2) {
+      item_02 = e.title || "";
+      item_02_quantity = `${e.quantity}`;
+      item_02_price = [e.price];
+      item_02_total_price = `${e.total_price}/-`;
+    } else if (i === 3) {
+      item_03 = e.title || "";
+      item_03_quantity = `${e.quantity}`;
+      item_03_price = [e.price];
+      item_03_total_price = `${e.total_price}/-`;
+    } else if (i === 4) {
+      item_04 = e.title || "";
+      item_04_quantity = `${e.quantity}`;
+      item_04_price = [e.price];
+      item_04_total_price = `${e.total_price}/-`;
+    } else if (i === 5) {
+      item_05 = e.title || "";
+      item_05_quantity = `${e.quantity}`;
+      item_05_price = [e.price];
+      item_05_total_price = `${e.total_price}/-`;
+    } else if (i === 6) {
+      item_06 = e.title || "";
+      item_06_quantity = `${e.quantity}`;
+      item_06_price = [e.price];
+      item_06_total_price = `${e.total_price}/-`;
+    }
+  });
 
   // doc.text(document.querySelector(".content > h2").innerHTML, 5, 75);
   doc.addImage("/invoice/invoice.jpg", 0, 0, 210, 297);
   doc.text(item?.status, 91, 77);
   doc.text(item?.customer_details.customer_name, 33, 91.4);
   doc.text(item?.customer_details.phone_number, 33.3, 99);
-  
+
   doc.text(item_01, 30, 139.6);
   doc.text(item_01_quantity, 116, 139.6);
   doc.text(item_01_price, 137, 139.6);
@@ -270,32 +269,37 @@ export const invoiceGenerate = (item) => {
   doc.text(item_06_price, 137, 208.2);
   doc.text(item_06_total_price, 168, 208.2);
 
-  doc.text((`${item?.totalPrice}/-`).toString(), 161, 225.5);
+  doc.text(`${item?.totalPrice}/-`.toString(), 161, 225.5);
   doc.text("Home", 182, 233.8);
-  doc.text((`${item?.deliveryCrg}/-`), 161, 233.8);
-  doc.text((`-${item?.discount}/-`).toString(), 161, 242.2);
+  doc.text(`${item?.deliveryCrg}/-`, 161, 233.8);
+  doc.text(`-${item?.discount}/-`.toString(), 161, 242.2);
 
-  doc.setFontSize(12).text(item?.customer_details.customer_address, 36.4, 106.5, {maxWidth: 165, align: 'left'});
+  doc
+    .setFontSize(12)
+    .text(item?.customer_details.customer_address, 36.4, 106.5, {
+      maxWidth: 165,
+      align: "left",
+    });
   doc.text(item?.date, 93, 83.5);
-  doc.setFont(undefined, 'bold');
+  doc.setFont(undefined, "bold");
   doc.setFontSize(15).text(item?.id, 43, 83.5);
-  doc.setFontSize(18).text((`${item?.customer_details?.salePrice.toString()}.00/-`), 161, 255.5);
-  
+  doc
+    .setFontSize(18)
+    .text(`${item?.customer_details?.salePrice.toString()}.00/-`, 161, 255.5);
+
   doc.save(item?.id);
   doc.autoPrint();
   //This is a key for printing
   doc.output("dataurlnewwindow");
 };
 
-export   const generateStick = (item, barCodeImageLink) => {
-
+export const generateStick = (item, barCodeImageLink) => {
   const doc = new jsPDF();
-
 
   let image = `${barCodeImageLink}`;
   // console.log(image)
 
-  doc.addImage(image, 30, 30, 140, 35);    
+  doc.addImage(image, 30, 30, 140, 35);
 
   doc.setFontSize(22).text(`Created by SM.Devware.`, 105, 285);
   doc.setFontSize(34);
@@ -306,14 +310,25 @@ export   const generateStick = (item, barCodeImageLink) => {
   doc.text(`Address: Nouhata, Paba, Rajshahi.`, 9, 250);
 
   doc.text(`Address: `, 22, 124);
-  doc.setFontSize(26).text((item?.customer_details.customer_address), 72, 124, {maxWidth: 140, align: 'left'});
+  doc.setFontSize(26).text(item?.customer_details.customer_address, 72, 124, {
+    maxWidth: 140,
+    align: "left",
+  });
   // doc.text(`Note: `, 22, 136);
   // doc.setFontSize(28).text(`Some Note`, 54, 136);
   doc.setFontSize(36).text(item?.id, 70, 74);
-  doc.setFont(undefined, 'bold');
+  doc.setFont(undefined, "bold");
   doc.setFontSize(36).text("Rajshahir Aam Wala", 38, 225);
-  doc.setFontSize(40).text(`${item?.customer_details.delivery_type ? "HOME" : "POINT"} DELIVERY`, 42, 180);
-  doc.setFontSize(40).text(`COD: ${item?.customer_details.salePrice}/-`, 65, 195);
+  doc
+    .setFontSize(40)
+    .text(
+      `${item?.customer_details.delivery_type ? "HOME" : "POINT"} DELIVERY`,
+      42,
+      180
+    );
+  doc
+    .setFontSize(40)
+    .text(`COD: ${item?.customer_details.salePrice}/-`, 65, 195);
   doc.setFontSize(36).text("Receiver:", 15, 88);
   doc.setFontSize(36).text("Sender:", 15, 210);
   doc.setFontSize(55).text("Rajshahir Aam Wala", 6, 25);

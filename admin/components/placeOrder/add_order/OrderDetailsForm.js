@@ -2,12 +2,21 @@ import React, { useEffect, useState } from "react";
 import { Tabs } from "@mantine/core";
 import { AppTextArea, FormInput, FormRadio } from "../../shared/Form";
 import { db } from "@/app/utils/firebase";
+import { useSelector } from "react-redux";
+import { selectSingleCustomer } from "@/app/redux/slices/singleCustomerSlice";
 
 const OrderDetailsForm = () => {
+  const [mango, setMango] = useState(null);
   const [khejurGur, setKhejurGur] = useState(null);
   const [honey, setHoney] = useState(null);
   const [mosla, setMosla] = useState(null);
   const [other, setOthers] = useState(null);
+  const [customer, setCustomer] = useState(null);
+
+  const getCustomer = useSelector(selectSingleCustomer);
+  useEffect(() => {
+    setCustomer(getCustomer);
+  }, [getCustomer]);
 
   // Get products from firebase database
   useEffect(() => {
@@ -15,32 +24,40 @@ const OrderDetailsForm = () => {
       .collection("products")
       .orderBy("timestamp", "desc")
       .onSnapshot((snap) => {
+        const mango = [];
         const khejur = [];
         const honeys = [];
         const moslagura = [];
         const others = [];
         snap.docs.map((doc) => {
-          doc.data().product_details.parent_category === "খেজুরের গুড়" &&
-          khejur.push({
+          doc.data().product_details.product_type === "আম" &&
+            mango.push({
               ...doc.data().product_details,
             });
-            doc.data().product_details.parent_category === "মধু" &&
+          doc.data().product_details.parent_category === "খেজুরের গুড়" &&
+            khejur.push({
+              ...doc.data().product_details,
+            });
+          doc.data().product_details.parent_category === "মধু" &&
             honeys.push({
-                ...doc.data().product_details,
-              });
-            doc.data().product_details.parent_category === "মশলা গুঁড়া" &&
+              ...doc.data().product_details,
+            });
+          doc.data().product_details.parent_category === "মশলা গুঁড়া" &&
             moslagura.push({
-                ...doc.data().product_details,
-              });
-           ( doc.data().product_details.parent_category === "সরিষার তেল" || doc.data().product_details.parent_category === "ঘি" || doc.data().product_details.parent_category === "কুমড়া বড়ি") &&
+              ...doc.data().product_details,
+            });
+          (doc.data().product_details.parent_category === "সরিষার তেল" ||
+            doc.data().product_details.parent_category === "ঘি" ||
+            doc.data().product_details.parent_category === "কুমড়া বড়ি") &&
             others.push({
-                ...doc.data().product_details,
-              });
+              ...doc.data().product_details,
+            });
         });
+        setMango(mango);
         setKhejurGur(khejur);
         setHoney(honeys);
         setMosla(moslagura);
-        setOthers(others)
+        setOthers(others);
       });
 
     return () => {
@@ -60,7 +77,6 @@ const OrderDetailsForm = () => {
         />
       </div>
       <div>
-        
         <span>Phone Number</span>
         <FormInput
           type="text"
@@ -84,14 +100,57 @@ const OrderDetailsForm = () => {
         />
       </div>
       <div>
-        <Tabs color="violet" defaultValue="khejurGur" variant="pills">
+        <Tabs color="violet" defaultValue="mango" variant="pills">
           <Tabs.List>
+            <Tabs.Tab value="mango">আম</Tabs.Tab>
             <Tabs.Tab value="khejurGur">খেজুরের গুড়</Tabs.Tab>
             <Tabs.Tab value="honey">মধু</Tabs.Tab>
             <Tabs.Tab value="mosla">মশলা গুঁড়া</Tabs.Tab>
             <Tabs.Tab value="others">অন্যান্য</Tabs.Tab>
           </Tabs.List>
 
+          <Tabs.Panel value="mango" pt="xs">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {mango?.map((i) => (
+                <div
+                  key={i.yup}
+                  className="p-2 bg-blue-500 rounded-md col-span-1"
+                >
+                  <span className="pb-10 text-lg text-white">
+                    #{i.product_name}
+                  </span>
+                  <div className="flex items-center pt-1 sm:pt-2">
+                    <div className="w-2/3">
+                      <FormInput
+                        type="number"
+                        name={i.yup}
+                        id="mango"
+                        item={i}
+                        placeholder=""
+                      />
+                    </div>
+                    <span className="text-lg text-white font-bold">x 12kg</span>
+                  </div>
+                  <div className="bg-slate-100 p-1 text-xs rounded-lg flex  justify-around">
+                    <div className="text-xs">
+                      <h1 className="text-sm leading-tight font-bold">Sale</h1>
+                      <span className="text-sm">120tk</span>
+                    </div>
+                    <div className="text-xs">
+                      <h1 className="text-sm leading-tight font-bold">
+                        Weight
+                      </h1>
+                      <span className="text-sm">36kg</span>
+                    </div>
+                    <div className="text-xs">
+                      <h1 className="text-sm leading-tight font-bold">Total</h1>
+                      <span className="text-sm">4230/-</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Tabs.Panel>
           <Tabs.Panel value="khejurGur" pt="xs">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {khejurGur?.map((i) => (
@@ -114,7 +173,7 @@ const OrderDetailsForm = () => {
           </Tabs.Panel>
 
           <Tabs.Panel value="others" pt="xs">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {other?.map((i) => (
                 <div
                   key={i.yup}
@@ -135,7 +194,7 @@ const OrderDetailsForm = () => {
           </Tabs.Panel>
 
           <Tabs.Panel value="honey" pt="xs">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {honey?.map((i) => (
                 <div
                   key={i.yup}
@@ -155,7 +214,7 @@ const OrderDetailsForm = () => {
             </div>
           </Tabs.Panel>
           <Tabs.Panel value="mosla" pt="xs">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {mosla?.map((i) => (
                 <div
                   key={i.yup}

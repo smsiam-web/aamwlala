@@ -3,9 +3,16 @@ import { useEffect, useState } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import { BsFillInfoCircleFill } from "react-icons/bs";
 import { Tooltip } from "@mantine/core";
+import { db } from "@/app/utils/firebase";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectSingleCustomer,
+  updateSingleCustomer,
+} from "@/app/redux/slices/singleCustomerSlice";
 
 function FormInput({
-  val,
+  item,
+  id,
   name,
   tooltip = false,
   hoverBoxContent,
@@ -14,10 +21,59 @@ function FormInput({
   edit_input,
   ...otherProps
 }) {
-  const { setFieldTouched, handleChange, errors, touched, values } =
+  const { setFieldTouched, setValues, handleChange, errors, touched, values } =
     useFormikContext();
   const [inputType, setInputType] = useState(type);
-  
+  const dispatch = useDispatch();
+  const [customer, setCustomer] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const getCustomer = useSelector(selectSingleCustomer);
+
+  useEffect(() => {
+    setCustomer(getCustomer);
+  }, [getCustomer]);
+
+  useEffect(() => {
+    if (id === "mango") {
+      const Weight = values?.gopalvhog_aam_12kg * 12;
+      const sale_price = Weight * item?.sale_price;
+      console.log(Weight, sale_price);
+    }
+  }, [id]);
+
+  console.log(item);
+
+  useEffect(() => {
+    setValues({
+      ...values,
+      customer_name: customer?.cus_name,
+      customer_address: customer?.cus_address,
+    });
+    setLoading(false);
+  }, [customer]);
+
+  useEffect(() => {
+    if (name === "phone_number") {
+      values.phone_number.length === 11 && customerData(values.phone_number);
+    }
+  }, [values?.phone_number]);
+
+  const customerData = async (id) => {
+    setLoading(true);
+    await dispatch(updateSingleCustomer([]));
+    await db
+      .collection("createCustomer")
+      .doc(id)
+      .get()
+      .then((doc) => {
+        if (!doc.data()) dispatch(updateSingleCustomer([]));
+        if (!!doc.data()) {
+          const customer = { ...doc.data() };
+          dispatch(updateSingleCustomer(customer));
+        }
+      });
+  };
+
   return (
     <div className={`${!editProfile ? "mb-4" : ""}`}>
       <div className="relative flex items-center">

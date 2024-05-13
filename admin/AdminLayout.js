@@ -3,13 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import NotFound from "@/app/components/NotFound";
 import { db } from "@/app/utils/firebase";
-import { updateOrder } from "@/app/redux/slices/orderSlice";
 
 const AdminLayout = ({ children }) => {
   const [key, setKey] = useState(null);
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
-
 
   // Get key from firebase database
   useEffect(() => {
