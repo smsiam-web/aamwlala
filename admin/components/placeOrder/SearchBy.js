@@ -20,7 +20,7 @@ import { notifications } from "@mantine/notifications";
 import { selectUser } from "@/app/redux/slices/authSlice";
 
 const SearchBy = ({ onClick }) => {
-  const [currentValue, setCurrentValue] = useState("RA02");
+  const [currentValue, setCurrentValue] = useState("RA012");
   const [filterOrder, setFilterOrder] = useState(null);
   const [openedd, setOpened] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
@@ -28,8 +28,8 @@ const SearchBy = ({ onClick }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-   if(!!opened) return;
-    setCurrentValue("RA02");
+    if (!!opened) return;
+    setCurrentValue("RA012");
     setFilterOrder(null);
   }, [opened]);
 
@@ -70,7 +70,7 @@ const SearchBy = ({ onClick }) => {
         },
         { merge: true }
       );
-    
+
     notifications.show({
       title: "Status Update successfully",
       message: `Customer Name ${filterOrder?.customer_details.customer_name}, Order ID: #${filterOrder?.id}`,
@@ -133,7 +133,7 @@ const SearchBy = ({ onClick }) => {
 
   useEffect(() => {
     const value = currentValue?.toUpperCase();
-    if (value?.split("0")[0] === "RA" && value.length === 8) {
+    if (value?.split("0")[0] === "RA" && value.length === 9) {
       filter(value);
     }
   }, [currentValue]);
@@ -190,8 +190,6 @@ const SearchBy = ({ onClick }) => {
   //     ? dispatch(updateOrder(limits))
   //     : dispatch(updateOrder(orders));
   // };
-
-
 
   const filter = async (id) => {
     await db
@@ -274,7 +272,9 @@ const SearchBy = ({ onClick }) => {
             </div>
             <div className="flex justify-between mb-10">
               <div className="flex ">
-                <h1 className="text-lg">Note: {filterOrder?.customer_details.note}</h1>
+                <h1 className="text-lg">
+                  Note: {filterOrder?.customer_details.note}
+                </h1>
               </div>
               <div className="text-sm flex ">
                 <div className="text-sm sm:text-xl text-title font-semibold">
@@ -298,28 +298,30 @@ const SearchBy = ({ onClick }) => {
               </div>
             </div>
             <div className="flex gap-4 justify-end">
-              {user.staff_role === "HR" && filterOrder.status === "Processing" && (
-                <Tooltip label="Sticker" color="green" withArrow>
-                  <span
-                    title="Sticker"
-                    className="bg-green-400 flex items-center gap-1 px-3 py-2 rounded-md cursor-pointer hover:bg-green-500 text-sm text-white font-medium hover:shadow-lg transition-all duration-300"
-                    onClick={() => stickerStatus(filterOrder)}
-                  >
-                    <FaPrint size={14} /> Sticker
-                  </span>
-                </Tooltip>
-              )}
-              {(user.staff_role === "HR" || user.staff_role === "Admin") && filterOrder.status === "Pending" && (
-                <Tooltip label="Invoice" color="blue" withArrow>
-                  <span
-                    title="Invoice"
-                    className="bg-blue-400 flex items-center gap-1 px-3 py-2 rounded-md cursor-pointer hover:bg-blue-500 text-sm text-white font-medium hover:shadow-lg transition-all duration-300"
-                    onClick={() => getInvoice(filterOrder)}
-                  >
-                    <AiOutlinePrinter size={18} /> Invoice
-                  </span>
-                </Tooltip>
-              )}
+              {user.staff_role === "HR" &&
+                filterOrder.status === "Processing" && (
+                  <Tooltip label="Sticker" color="green" withArrow>
+                    <span
+                      title="Sticker"
+                      className="bg-green-400 flex items-center gap-1 px-3 py-2 rounded-md cursor-pointer hover:bg-green-500 text-sm text-white font-medium hover:shadow-lg transition-all duration-300"
+                      onClick={() => stickerStatus(filterOrder)}
+                    >
+                      <FaPrint size={14} /> Sticker
+                    </span>
+                  </Tooltip>
+                )}
+              {(user.staff_role === "HR" || user.staff_role === "Admin") &&
+                filterOrder.status === "Pending" && (
+                  <Tooltip label="Invoice" color="blue" withArrow>
+                    <span
+                      title="Invoice"
+                      className="bg-blue-400 flex items-center gap-1 px-3 py-2 rounded-md cursor-pointer hover:bg-blue-500 text-sm text-white font-medium hover:shadow-lg transition-all duration-300"
+                      onClick={() => getInvoice(filterOrder)}
+                    >
+                      <AiOutlinePrinter size={18} /> Invoice
+                    </span>
+                  </Tooltip>
+                )}
             </div>
           </div>
         )}
