@@ -12,8 +12,8 @@ import { Today } from "@/admin/utils/helpers";
 import { selectConfig } from "@/app/redux/slices/configSlice";
 import axios from "axios";
 import { selectSingleCustomer } from "@/app/redux/slices/singleCustomerSlice";
-import { Formik } from "formik";
 import { selectProduct } from "@/app/redux/slices/productSlice";
+import { notifications } from "@mantine/notifications";
 
 const validationSchema = Yup.object().shape({
   delivery_type: Yup.boolean().required().label("Delivery type"),
@@ -35,8 +35,6 @@ const AddOrder = ({ onClick }) => {
   const router = useRouter();
   const [products, setProducts] = useState(null);
   const [uid, setInvoiceID] = useState(null);
-  const [customer, setCustomer] = useState(null);
-  const [data, setResponse] = useState(null);
 
   const getCustomer = useSelector(selectSingleCustomer);
   const p = useSelector(selectProduct);
@@ -91,10 +89,6 @@ const AddOrder = ({ onClick }) => {
       unSub();
     };
   }, []);
-
-  useEffect(() => {
-    setCustomer(getCustomer);
-  }, [getCustomer]);
 
   // place product handler on submit
   const placeOrder = async (values) => {
@@ -157,8 +151,6 @@ const AddOrder = ({ onClick }) => {
         : "0";
 
     const date = Today();
-
-    console.log(values?.delivery_type);
 
     try {
       // Set your API key and secret key
@@ -230,11 +222,7 @@ const AddOrder = ({ onClick }) => {
         invoice_str,
         timestamp
       );
-      await sendConfirmationMsg(
-        values,
-        invoice_str,
-        data?.consignment.tracking_code
-      );
+      await sendConfirmationMsg(values, invoice_str);
     } catch (error) {
       await isFailedPlaceOrderHandler(
         deliveryCrg,
@@ -286,6 +274,11 @@ const AddOrder = ({ onClick }) => {
       .post(url, formData)
       .then((response) => {
         console.log(response.data);
+        notifications.show({
+          title: response?.data.msg,
+          message: "Message sent successfully",
+          color: "blue",
+        });
       })
       .catch((error) => {
         throw new Error(error);
@@ -305,7 +298,6 @@ const AddOrder = ({ onClick }) => {
 
   // save order details on firebase database
   const placeOrderHandler = async (
-    data,
     deliveryCrg,
     weight,
     values,
@@ -317,8 +309,6 @@ const AddOrder = ({ onClick }) => {
     timestamp
   ) => {
     await db.collection("placeOrder").doc(invoice_str).set({
-      consignment_id: data?.consignment.consignment_id,
-      // tracking_code: data?.consignment.tracking_code,
       deliveryCrg,
       weight,
       customer_details: values,

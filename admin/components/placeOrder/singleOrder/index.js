@@ -1,13 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import { useSelector } from "react-redux";
-import { selectOrder } from "@/app/redux/slices/orderSlice";
-import { useBarcode } from 'next-barcode';
-import { jsxToPng } from 'jsx-to-png';
-import GenerateStick from "@/admin/utils/GenerateSticker";
+import { useBarcode } from "next-barcode";
 import Image from "next/image";
-
+import { db } from "@/app/utils/firebase";
 
 const GeneratePDF = dynamic(() => import("../../../utils/GeneratePDF"), {
   ssr: false,
@@ -15,39 +11,32 @@ const GeneratePDF = dynamic(() => import("../../../utils/GeneratePDF"), {
 const OrderDetails = ({ onClick, item }) => {
   const ref = useRef();
   const [id, setId] = useState(usePathname()?.split("=")[1]);
-  const [orders, setOrders] = useState(useSelector(selectOrder));
   const [singleOrder, setSingleOrder] = useState(item || null);
-  const [disabled, setDisabled] = useState(true);
-
-
 
   useEffect(() => {
-    !singleOrder && orders &&
-    orders?.map((item) => {
-      if (item.id !== id) return;
-      setSingleOrder(item);
-      setDisabled(false);
-    });
+    db.collection("placeOrder")
+      .doc(id)
+      .get()
+      .then((doc) => {
+        setSingleOrder(doc.data());
+      });
   }, [id]);
 
   const { inputRef } = useBarcode({
     value: id,
     options: {
-      background: '#FFFFFF',
+      background: "#FFFFFF",
       displayValue: false,
       width: 3,
       height: 80,
-    }
+    },
   });
 
+  console.log(singleOrder);
 
   return (
     <div className="">
-
-      <div
-        className={`${disabled && "hidden"} bg-white max-w-5xl relative`}
-        ref={ref}
-      >
+      <div className={`bg-white max-w-5xl relative`} ref={ref}>
         <img id="bar_code" ref={inputRef} className="hidden" />
         <img
           id="image"
@@ -71,7 +60,7 @@ const OrderDetails = ({ onClick, item }) => {
                   id="invoiceNo"
                   className="text-primary font-bold text-sm sm:text-xl md:text-2xl  font-mono"
                 >
-                  {singleOrder?.id}
+                  {id}
                 </span>
               </div>
               <div className="flex justify-center items-center">
@@ -188,7 +177,12 @@ const OrderDetails = ({ onClick, item }) => {
           </div>
           <div className="flex items-center justify-end sm:justify-between w-full">
             <div className="hidden sm:block sm:w-2/5">
-              <Image src="/invoice/col.png" alt="adv" width={400} height={400} />
+              <Image
+                src="/invoice/col.png"
+                alt="adv"
+                width={400}
+                height={400}
+              />
             </div>
 
             <div className="flex flex-col w-2/3 sm:w-1/2 border-t-2 text-sm mt-8 sm:mt-32">
@@ -211,13 +205,16 @@ const OrderDetails = ({ onClick, item }) => {
                   id="shipping_type"
                   className="text-sm sm:text-lg md:text-xl text-title font-mono"
                 >
-                  {singleOrder?.customer_details?.delivery_type ? "HOME" : "POINT"}
+                  {singleOrder?.customer_details?.delivery_type
+                    ? "HOME"
+                    : "POINT"}
                 </h1>
                 <h1
                   id="shipping_cost"
                   className="text-sm sm:text-xl md:text-2xl text-title font-mono"
                 >
-                  {singleOrder?.deliveryCrg ? singleOrder?.deliveryCrg : "150"}/-
+                  {singleOrder?.deliveryCrg ? singleOrder?.deliveryCrg : "150"}
+                  /-
                 </h1>
               </div>
               <div className="flex w-full px-4 py-1 justify-between">
@@ -247,12 +244,6 @@ const OrderDetails = ({ onClick, item }) => {
         </div>
         <img src="/invoice/foot.png" alt="" />
       </div>
-      <GeneratePDF
-        html={ref}
-        disabled={disabled}
-        onClick={() => jsxToPng(null)}
-      />
-      <GenerateStick html={ref}  />
     </div>
   );
 };
