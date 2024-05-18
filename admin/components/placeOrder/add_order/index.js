@@ -255,7 +255,6 @@ const AddOrder = ({ onClick }) => {
     await createCustomer(values, date, cusetomer_id, timestamp);
 
     router.push("/admin/place-order/id=" + invoice_str);
-    setLoading(false);
     setOrderResponse(null);
   };
 
@@ -406,6 +405,7 @@ const AddOrder = ({ onClick }) => {
                 </div>
                 <div className="col-span-2">
                   <FormBtn
+                    disabled={loading}
                     loading={loading}
                     onClick={placeOrder}
                     title="Submit"
