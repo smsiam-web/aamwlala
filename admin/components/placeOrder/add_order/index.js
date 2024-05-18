@@ -13,6 +13,7 @@ import { selectConfig } from "@/app/redux/slices/configSlice";
 import axios from "axios";
 import { selectSingleCustomer } from "@/app/redux/slices/singleCustomerSlice";
 import { Formik } from "formik";
+import { selectProduct } from "@/app/redux/slices/productSlice";
 
 const validationSchema = Yup.object().shape({
   delivery_type: Yup.boolean().required().label("Delivery type"),
@@ -35,9 +36,16 @@ const AddOrder = ({ onClick }) => {
   const [products, setProducts] = useState(null);
   const [uid, setInvoiceID] = useState(null);
   const [customer, setCustomer] = useState(null);
+  const [data, setResponse] = useState(null);
 
   const getCustomer = useSelector(selectSingleCustomer);
-  console.log(customer);
+  const p = useSelector(selectProduct);
+
+  useEffect(() => {
+    const temp = [];
+    const item = p?.map((i) => temp.push(i?.product_details));
+    setProducts(temp);
+  }, []);
 
   // // Function to place an order
   // const placeOrderStf = async (orderData) => {
@@ -88,27 +96,6 @@ const AddOrder = ({ onClick }) => {
     setCustomer(getCustomer);
   }, [getCustomer]);
 
-  // Get products from firebase database
-  useEffect(() => {
-    const unSub = db
-      .collection("products")
-      .orderBy("timestamp", "desc")
-      .onSnapshot((snap) => {
-        const product = [];
-        snap.docs.map((doc) => {
-          // doc.data().product_details.parent_category === "খেজুরের গুড়" &&
-          product.push({
-            ...doc.data().product_details,
-          });
-        });
-        setProducts(product);
-      });
-
-    return () => {
-      unSub();
-    };
-  }, []);
-
   // place product handler on submit
   const placeOrder = async (values) => {
     setLoading(true);
@@ -123,6 +110,8 @@ const AddOrder = ({ onClick }) => {
 
     products &&
       products.map((item) => {
+        console.log(item?.product_type === "আম");
+
         const yup = item.yup;
 
         if (values[yup]) {
@@ -136,12 +125,22 @@ const AddOrder = ({ onClick }) => {
 
           weight += values[yup];
 
-          order.push({
-            title: s.join(" "),
-            quantity: values[yup],
-            price: item.sale_price,
-            total_price: values[yup] * item.sale_price,
-          });
+          if (item?.product_type === "আম") {
+            order.push({
+              title: s.join(" "),
+              quantity: values[yup] * 12,
+              lot: values[yup],
+              price: item.sale_price,
+              total_price: values[yup] * 12 * item.sale_price,
+            });
+          } else {
+            order.push({
+              title: s.join(" "),
+              quantity: values[yup],
+              price: item.sale_price,
+              total_price: values[yup] * item.sale_price,
+            });
+          }
         }
       });
 
@@ -159,6 +158,8 @@ const AddOrder = ({ onClick }) => {
 
     const date = Today();
 
+    console.log(values?.delivery_type);
+
     try {
       // Set your API key and secret key
       const apiKey = config[0]?.values.sfc_api_key;
@@ -170,30 +171,55 @@ const AddOrder = ({ onClick }) => {
       headers.append("Secret-Key", secretKey);
       headers.append("Content-Type", "application/json");
 
-      const orderData = {
-        cod_amount: `${values.salePrice}`,
-        invoice: `${invoice_str}`,
-        note: `${values.note}`,
-        recipient_address: `${values.customer_address}`,
-        recipient_name: `${values.customer_name}`,
-        recipient_phone: `${values.phone_number}`,
-      };
+      order.map((item, index) => {
+        if (!!item.lot) {
+          const perValu = Math.round(values?.salePrice / order?.length);
+          const singleLotValue = Math.round(perValu / item.lot);
 
-      // Make the POST request
-      const response = await fetch(
-        "https://portal.steadfast.com.bd/api/v1/create_order",
-        {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(orderData),
+          for (let i = 1; i <= item.lot; i++) {
+            const orderDataLot = {
+              cod_amount: singleLotValue,
+              invoice: `${invoice_str}_i${1 + index}_L0${i}`,
+              note: `${values.note} ${item?.title}`,
+              recipient_address: `${
+                values?.delivery_type ? "HOME Delivery, " : "POINT Delivery, "
+              }${values.customer_address}`,
+              recipient_name: `${values.customer_name}_${1 + index}_L0${i}`,
+              recipient_phone: `${values.phone_number}`,
+            };
+            const response = fetch(
+              "https://portal.steadfast.com.bd/api/v1/create_order",
+              {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(orderDataLot),
+              }
+            );
+          }
+        } else {
+          const orderData = {
+            cod_amount: `${values.salePrice}`,
+            invoice: `${invoice_str}`,
+            note: `${values.note}`,
+            recipient_address: `${
+              values?.delivery_type ? "HOME Delivery, " : "POINT Delivery, "
+            }${values.customer_address}`,
+            recipient_name: `${values.customer_name}`,
+            recipient_phone: `${values.phone_number}`,
+          };
+          const response = fetch(
+            "https://portal.steadfast.com.bd/api/v1/create_order",
+            {
+              method: "POST",
+              headers: headers,
+              body: JSON.stringify(orderData),
+            }
+          );
         }
-      );
+      });
 
-      // Handle the response
-      const data = await response.json();
-      console.log(data);
+      // // Handle the response
       await placeOrderHandler(
-        data,
         deliveryCrg,
         weight,
         values,
@@ -209,9 +235,6 @@ const AddOrder = ({ onClick }) => {
         invoice_str,
         data?.consignment.tracking_code
       );
-
-      // You can update the state or perform other actions based on the response
-      // For example, if using React with state:
     } catch (error) {
       await isFailedPlaceOrderHandler(
         deliveryCrg,
@@ -296,7 +319,7 @@ const AddOrder = ({ onClick }) => {
   ) => {
     await db.collection("placeOrder").doc(invoice_str).set({
       consignment_id: data?.consignment.consignment_id,
-      tracking_code: data?.consignment.tracking_code,
+      // tracking_code: data?.consignment.tracking_code,
       deliveryCrg,
       weight,
       customer_details: values,

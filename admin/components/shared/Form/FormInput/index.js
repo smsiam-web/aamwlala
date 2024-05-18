@@ -9,6 +9,11 @@ import {
   selectSingleCustomer,
   updateSingleCustomer,
 } from "@/app/redux/slices/singleCustomerSlice";
+import { selectProduct } from "@/app/redux/slices/productSlice";
+import {
+  selectWeightDetails,
+  updateWeightDetails,
+} from "@/app/redux/slices/tempWeightDetails";
 
 function FormInput({
   item,
@@ -26,23 +31,40 @@ function FormInput({
   const [inputType, setInputType] = useState(type);
   const dispatch = useDispatch();
   const [customer, setCustomer] = useState(null);
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const getCustomer = useSelector(selectSingleCustomer);
+  const products = useSelector(selectProduct);
+  const details = useSelector(selectWeightDetails);
+
+  useEffect(() => {
+    const filter = [];
+    products?.filter(
+      (item) => item.product_details.product_type === "আম" && filter.push(item)
+    );
+    setProduct(filter);
+  }, []);
 
   useEffect(() => {
     setCustomer(getCustomer);
   }, [getCustomer]);
 
   useEffect(() => {
-    if (id === "mango") {
-      const Weight = values?.gopalvhog_aam_12kg * 12;
-      const sale_price = Weight * item?.sale_price;
-      console.log(Weight, sale_price);
-    }
-  }, [id]);
-
-  console.log(item);
-  console.log(values);
+    if (id !== "mango") return;
+    product?.map((i) => {
+      if (name === "gopalvhog_aam_12kg") {
+        const Weight = values?.gopalvhog_aam_12kg * 12;
+        const sale_price = Weight * item?.sale_price;
+        dispatch(
+          updateWeightDetails({
+            name: i?.product_details?.yup,
+            weight: Weight || 0,
+            price: sale_price || 0,
+          })
+        );
+      }
+    });
+  }, [values]);
 
   useEffect(() => {
     setValues({

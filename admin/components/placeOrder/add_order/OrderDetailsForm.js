@@ -4,6 +4,7 @@ import { AppTextArea, FormInput, FormRadio } from "../../shared/Form";
 import { db } from "@/app/utils/firebase";
 import { useSelector } from "react-redux";
 import { selectSingleCustomer } from "@/app/redux/slices/singleCustomerSlice";
+import { selectWeightDetails } from "@/app/redux/slices/tempWeightDetails";
 
 const OrderDetailsForm = () => {
   const [mango, setMango] = useState(null);
@@ -12,11 +13,14 @@ const OrderDetailsForm = () => {
   const [mosla, setMosla] = useState(null);
   const [other, setOthers] = useState(null);
   const [customer, setCustomer] = useState(null);
+  const [weightDetails, setweightDetails] = useState(null);
 
   const getCustomer = useSelector(selectSingleCustomer);
+  const getWeightDetails = useSelector(selectWeightDetails);
   useEffect(() => {
     setCustomer(getCustomer);
-  }, [getCustomer]);
+    setweightDetails(getWeightDetails);
+  }, [getCustomer, getWeightDetails]);
 
   // Get products from firebase database
   useEffect(() => {
@@ -133,18 +137,32 @@ const OrderDetailsForm = () => {
                   </div>
                   <div className="bg-slate-100 p-1 text-xs rounded-lg flex  justify-around">
                     <div className="text-xs">
-                      <h1 className="text-sm leading-tight font-bold">Sale</h1>
-                      <span className="text-sm">120tk</span>
+                      <h1 className="text-sm leading-tight font-medium">
+                        Sale
+                      </h1>
+                      <span className="text-sm bg-green-200 font-semibold text-green-700 px-2 rounded-full">
+                        {i.sale_price}tk
+                      </span>
                     </div>
                     <div className="text-xs">
-                      <h1 className="text-sm leading-tight font-bold">
+                      <h1 className="text-sm leading-tight font-medium">
                         Weight
                       </h1>
-                      <span className="text-sm">36kg</span>
+                      <span className="text-sm bg-green-200 text-green-700 font-semibold px-2 rounded-full">
+                        {weightDetails.name === i.yup
+                          ? weightDetails.weight
+                          : 0}
+                        kg
+                      </span>
                     </div>
                     <div className="text-xs">
-                      <h1 className="text-sm leading-tight font-bold">Total</h1>
-                      <span className="text-sm">4230/-</span>
+                      <h1 className="text-sm leading-tight font-medium">
+                        Total
+                      </h1>
+                      <span className="text-sm bg-green-200 font-semibold text-green-700 px-2 rounded-full">
+                        {weightDetails.name === i.yup ? weightDetails.price : 0}
+                        /-
+                      </span>
                     </div>
                   </div>
                 </div>
