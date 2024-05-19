@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import { useBarcode } from "next-barcode";
 import Image from "next/image";
 import { db } from "@/app/utils/firebase";
+import GeneratePdf from "../../../utils/GeneratePDF";
+import GenerateStick from "@/admin/utils/GenerateSticker";
 
 const GeneratePDF = dynamic(() => import("../../../utils/GeneratePDF"), {
   ssr: false,
@@ -244,6 +246,9 @@ const OrderDetails = ({ onClick, item }) => {
         </div>
         <img src="/invoice/foot.png" alt="" />
       </div>
+
+      <GeneratePdf html={ref} disabled={true} onClick={() => jsxToPng(null)} />
+      <GenerateStick html={ref} />
     </div>
   );
 };

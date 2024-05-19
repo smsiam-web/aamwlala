@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { AiOutlineSetting } from "react-icons/ai";
-import { RxDashboard } from "react-icons/rx";
 import { IoIosLogOut } from "react-icons/io";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { auth, db } from "@/app/utils/firebase";
+import { auth } from "@/app/utils/firebase";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/app/redux/slices/authSlice";
+import Button from "../shared/Button";
 
 const NavUser = () => {
   const [isActive, setActive] = useState(false);
   const router = useRouter();
+  const user = useSelector(selectUser);
   const toggle = () => {
     {
       isActive === false ? setActive(true) : setActive(false);
@@ -38,32 +40,49 @@ const NavUser = () => {
         quality={100}
       />
       {isActive && (
-        <ul className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white p-1 ring-1 ring-black ring-opacity-5 focus:outline-none">
-          <li className="justify-between font-serif font-medium py-2 pl-4 transition-colors duration-150 hover:bg-gray-100 text-gray-500 hover:text-green-500 ">
-            <Link href={"/admin"}>
-              <span className="flex items-center gap-3 text-sm">
-                <RxDashboard size={18} />
-                <span>Dashboard</span>
-              </span>
-            </Link>
-          </li>
-          <li className="justify-between font-serif font-medium py-2 pl-4 transition-colors duration-150 hover:bg-gray-100 text-gray-500 hover:text-green-500 ">
-            <Link href={"/admin/setting"}>
-              <span className="flex items-center gap-3 text-sm">
-                <AiOutlineSetting size={18} />
-                <span>Edit Profile</span>
-              </span>
-            </Link>
-          </li>
-          <li className="justify-between font-serif font-medium py-2 pl-4 transition-colors duration-150 hover:bg-gray-100 text-gray-500 hover:text-green-500 ">
-            <Link href={"/admin"} onClick={() => singOutAction()}>
-              <span className="flex items-center gap-3 text-sm">
-                <IoIosLogOut size={18} />
-                <span>Log Out</span>
-              </span>
-            </Link>
-          </li>
-        </ul>
+        <>
+          <ul className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-xl bg-white p-1 ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="flex justify-center pt-3 pb-1">
+              <Image
+                className="cursor-pointer hover:shadow-md rounded-full"
+                src={user?.image ? user?.image : "/avatar.jpg"}
+                alt="Picture of the author"
+                width={100}
+                height={100}
+                quality={100}
+              />
+            </div>
+            <li className="justify-between font-serif font-medium cursor-default">
+              <p className="text-center text-base sm:text-lg ">
+                {user?.name ? user.name : "Name: Null"}
+              </p>
+            </li>
+            <li className="justify-between font-serif font-medium cursor-default">
+              <p className="text-center text-sm sm:text-base ">
+                {user?.email ? user.email : "Email: Null"}
+              </p>
+            </li>
+            <li className="justify-between font-sans font-medium cursor-default">
+              <p className="text-center text-base sm:text-lg ">
+                {user?.phone ? user.phone : "Contact: Null"}
+              </p>
+            </li>
+            <li className="justify-between font-serif font-medium cursor-default">
+              <p className="text-center text-base sm:text-lg ">
+                {user?.staff_role ? user.staff_role : "Null"}
+              </p>
+            </li>
+            <li className="flex justify-center font-serif font-medium py-3">
+              <Link href={"/admin"} onClick={() => singOutAction()}>
+                <Button
+                  className="bg-primary hover:bg-orange-500 duration-200 ease-in  text-white font-bold"
+                  title="Logout"
+                  icon={<IoIosLogOut size={18} />}
+                />
+              </Link>
+            </li>
+          </ul>
+        </>
       )}
     </div>
   );
